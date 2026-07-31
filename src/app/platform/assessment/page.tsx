@@ -79,12 +79,12 @@ export default function AssessmentPage() {
         {step === 3 && <Q3 answers={answers} update={update} onNext={() => setStep(4)} onBack={() => setStep(2)} />}
         {step === 4 && <Q4 answers={answers} update={update} onNext={() => setStep(5)} onBack={() => setStep(3)} />}
         {step === 5 && <Q5 answers={answers} update={update} onNext={() => setStep(6)} onBack={() => setStep(4)} />}
-        {step === 6 && <Q6 answers={answers} toggle={(v) => toggleMulti('workInterests', v)} onNext={() => setStep(7)} onBack={() => setStep(5)} />}
+        {step === 6 && <Q6 answers={answers} toggle={(v: string) => toggleMulti('workInterests', v)} onNext={() => setStep(7)} onBack={() => setStep(5)} />}
         {step === 7 && <Q7 answers={answers} update={update} onNext={() => setStep(8)} onBack={() => setStep(6)} />}
         {step === 8 && <Q8 answers={answers} update={update} onNext={() => setStep(9)} onBack={() => setStep(7)} />}
         {step === 9 && <Q9 answers={answers} update={update} onNext={() => setStep(10)} onBack={() => setStep(8)} />}
         {step === 10 && <Q10 answers={answers} update={update} onNext={() => setStep(11)} onBack={() => setStep(9)} />}
-        {step === 11 && <Q11 answers={answers} toggle={(v) => toggleMulti('aiToolsNeeded', v)} onNext={() => setStep(12)} onBack={() => setStep(10)} />}
+        {step === 11 && <Q11 answers={answers} toggle={(v: string) => toggleMulti('aiToolsNeeded', v)} onNext={() => setStep(12)} onBack={() => setStep(10)} />}
         {step === 12 && <Q12 answers={answers} update={update} onNext={() => setStep(13)} onBack={() => setStep(11)} />}
         {step === 13 && <Q13 answers={answers} update={update} onNext={() => setStep(14)} onBack={() => setStep(12)} />}
         {step === 14 && <Q14 answers={answers} update={update} onNext={() => setStep(15)} onBack={() => setStep(13)} />}

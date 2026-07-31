@@ -172,7 +172,7 @@ function recommendTools(assessment: Assessment, stage: RebuildStage): ToolId[] {
   ) tools.push('fractional_planner')
   if (assessment.primaryFear === 'retirement') tools.push('retirement_planner')
 
-  return [...new Set(tools)]
+  return Array.from(new Set(tools))
 }
 
 // ----------------------------
