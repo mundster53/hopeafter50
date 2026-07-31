@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --navy: #1B2B4B;
+    --amber-hope: #C8922A;
+    --slate-supporting: #6B7A8D;
+    --sage: #E8EDE8;
+    --warm-white: #F8F6F2;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-playfair), Georgia, serif;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-amber-hope text-white font-body font-semibold px-8 py-4 rounded-card
+           hover:bg-amber-light transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-amber-hope focus:ring-offset-2;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-navy font-body font-semibold px-8 py-4 rounded-card
+           border-2 border-navy hover:bg-navy hover:text-white transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-slate-supporting font-body font-medium px-4 py-2
+           hover:text-navy transition-colors duration-200
+           focus:outline-none focus:ring-2 focus:ring-navy focus:ring-offset-2;
+  }
+
+  .card {
+    @apply bg-white rounded-card shadow-card p-6;
+  }
+
+  .card-hover {
+    @apply card hover:shadow-card-hover transition-shadow duration-200;
+  }
+
+  .section-padding {
+    @apply py-section px-6 md:px-8;
+  }
+
+  .section-padding-sm {
+    @apply py-section-sm px-6 md:px-8;
+  }
+
+  .max-content {
+    @apply max-w-content mx-auto;
+  }
+
+  .max-wide {
+    @apply max-w-wide mx-auto;
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    @apply h-2 bg-sage rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-amber-hope rounded-full transition-all duration-500;
+  }
+
+  /* Stage badge */
+  .stage-badge {
+    @apply inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium
+           bg-amber-pale text-amber-hope border border-amber-hope/20;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
