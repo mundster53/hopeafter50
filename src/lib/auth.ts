@@ -11,8 +11,6 @@ import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '@/lib/db/client'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
-
 export const authOptions: NextAuthOptions = {
   // Persist sessions and accounts in your Postgres database
   adapter: PrismaAdapter(prisma) as any,
@@ -36,6 +34,7 @@ export const authOptions: NextAuthOptions = {
     EmailProvider({
       from: process.env.FROM_EMAIL ?? 'hello@hopeafter50.com',
       sendVerificationRequest: async ({ identifier: email, url }) => {
+        const resend = new Resend(process.env.RESEND_API_KEY)
         await resend.emails.send({
           from: `HopeAfter50 <${process.env.FROM_EMAIL ?? 'hello@hopeafter50.com'}>`,
           to: email,
