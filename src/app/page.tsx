@@ -32,8 +32,8 @@ export default function HomePage() {
 function Hero() {
   return (
     <section className="bg-navy text-warm-white section-padding min-h-[90vh] flex items-center">
-      <div className="max-wide w-full">
-        <div className="max-w-2xl">
+      <div className="max-wide w-full mx-auto">
+        <div className="max-w-2xl mx-auto">
           <p className="text-amber-hope font-body font-medium text-sm tracking-widest uppercase mb-6">
             HopeAfter50
           </p>
@@ -83,7 +83,7 @@ function WeUnderstand() {
 
   return (
     <section className="bg-warm-white section-padding">
-      <div className="max-content">
+      <div className="max-content mx-auto">
         <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4">
           Because we've been there.
         </p>
@@ -126,7 +126,7 @@ function WhatWeDo() {
 
   return (
     <section className="bg-navy section-padding">
-      <div className="max-content">
+      <div className="max-content mx-auto">
         <p className="font-body text-amber-hope text-sm tracking-widest uppercase mb-4">What We Do</p>
         <h2 className="font-display text-display-md text-white mb-10">
           HopeAfter50 helps experienced professionals:
@@ -169,7 +169,7 @@ function WhatHappensNext() {
 
   return (
     <section className="bg-warm-white section-padding">
-      <div className="max-content">
+      <div className="max-content mx-auto">
         <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4">
           The Path Forward
         </p>
@@ -239,7 +239,7 @@ function AreasWeHelp() {
 
   return (
     <section className="bg-sage section-padding">
-      <div className="max-wide">
+      <div className="max-wide mx-auto">
         <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4 text-center">
           Where We Can Help
         </p>
@@ -274,7 +274,7 @@ function OurPromise() {
 
   return (
     <section className="bg-navy section-padding">
-      <div className="max-content">
+      <div className="max-content mx-auto">
         <p className="font-body text-amber-hope text-sm tracking-widest uppercase mb-4">
           Our Promise
         </p>
@@ -301,7 +301,7 @@ function OurPromise() {
 function FinalCTA() {
   return (
     <section className="bg-warm-white section-padding text-center">
-      <div className="max-content">
+      <div className="max-content mx-auto">
         <h2 className="font-display text-display-md text-navy mb-4">
           You don't have to have everything figured out today.
         </h2>
