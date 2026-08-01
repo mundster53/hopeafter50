@@ -13,3 +13,9 @@ This ministry points to God through action, not proclamation. Every feature, eve
 5. **Hope grows through progress.** Show what's accomplished, not just what remains.
 6. **The member owns the journey.** HopeAfter50 provides guidance. They decide.
 7. **The goal is to need the platform less.** Not to keep members engaged forever.
+
+---
+
+## AI Model
+
+The platform's designated AI model is **Claude Sonnet (`claude-sonnet-4-6`)**, called via the Anthropic API. All AI-powered tools (resume analysis, LinkedIn optimization, interview prep, etc.) should use this model.
