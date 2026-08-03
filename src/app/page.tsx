@@ -60,9 +60,6 @@ function Hero() {
             <Link href="/platform/assessment" className="btn-primary text-center">
               Start My Rebuild
             </Link>
-            <Link href="/about" className="btn-secondary border-white text-white hover:bg-white hover:text-navy text-center">
-              Read Bret's Story
-            </Link>
           </div>
         </div>
       </div>

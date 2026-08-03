@@ -14,7 +14,6 @@ export default function Nav() {
         <div className="hidden md:flex items-center gap-8">
           <Link href="/about" className="font-body text-white/70 hover:text-white transition-colors text-sm">About</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white transition-colors text-sm">Resources</Link>
-          <Link href="/about#brets-story" className="font-body text-white/70 hover:text-white transition-colors text-sm">Bret's Story</Link>
           <Link href="/platform/dashboard" className="font-body text-white/70 hover:text-white transition-colors text-sm">Sign In</Link>
           <Link href="/platform/assessment" className="btn-primary py-2 px-5 text-sm">
             Start My Rebuild
@@ -38,7 +37,6 @@ export default function Nav() {
         <div className="md:hidden bg-navy border-t border-white/10 px-6 py-4 space-y-4">
           <Link href="/about" className="block font-body text-white/70 hover:text-white">About</Link>
           <Link href="/resources" className="block font-body text-white/70 hover:text-white">Resources</Link>
-          <Link href="/about#brets-story" className="block font-body text-white/70 hover:text-white">Bret's Story</Link>
           <Link href="/platform/dashboard" className="block font-body text-white/70 hover:text-white">Sign In</Link>
           <Link href="/platform/assessment" className="btn-primary block text-center">Start My Rebuild</Link>
         </div>
