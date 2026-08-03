@@ -31,7 +31,7 @@ export default function HomePage() {
 // ----------------------------
 function Hero() {
   return (
-    <section className="min-h-screen bg-navy flex items-center py-20 px-6">
+    <section className="relative min-h-screen bg-navy flex items-center py-20 px-6">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-display text-6xl md:text-7xl text-white leading-tight mb-6">
           You spent decades building your career.
@@ -57,6 +57,13 @@ function Hero() {
         <p className="font-body text-lg text-white font-semibold mt-6">
           Free for everyone who needs it.
         </p>
+      </div>
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+        <div className="animate-bounce text-white/50">
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+          </svg>
+        </div>
       </div>
     </section>
   )
