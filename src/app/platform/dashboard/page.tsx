@@ -1,39 +1,32 @@
 // ============================================================
 // HopeAfter50 — Member Dashboard
 // Artifact 4 — the daily operating center
-// TODO: replace mock data with real session + DB queries
+// Server-rendered from the authenticated session + Prisma. No mock data.
 // ============================================================
-'use client'
 
 import Link from 'next/link'
+import { getServerSession } from 'next-auth'
+import { redirect } from 'next/navigation'
+import { authOptions } from '@/lib/auth'
+import { getMemberForSession, buildDashboardViewModel } from '@/lib/db/queries'
 import { TOOLS } from '@/lib/tools'
 import { STAGE_LABELS } from '@/lib/rebuild-engine'
-import { RebuildStage, ToolId } from '@/types'
+import { ToolId } from '@/types'
+import SignOutButton from '@/components/platform/SignOutButton'
 
-// Mock data — replace with real data from DB/session
-const MOCK = {
-  name: 'Bret',
-  currentFocus: 'Replace Income',
-  stage: 'execute' as RebuildStage,
-  progressPercent: 40,
-  financialRunway: 'Approximately 4 Months',
-  nextAction: {
-    title: 'Optimize Your Resume',
-    estimatedMinutes: 30,
-    url: '/platform/tools/resume',
-  },
-  todayActions: [
-    { label: 'Resume Optimization', url: '/platform/tools/resume', done: false },
-    { label: 'LinkedIn Optimization', url: '/platform/tools/linkedin', done: false },
-    { label: 'Executive Job Strategy', url: '/platform/tools/income-strategy', done: false },
-  ],
-  activeTools: ['resume_optimizer', 'linkedin_optimizer', 'income_strategy', 'financial_runway'] as ToolId[],
-  recentWins: ['Assessment Completed'],
-  unreadMessages: 0,
-  faithBased: true,
-}
+export default async function DashboardPage() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    redirect('/auth/signin')
+  }
 
-export default function DashboardPage() {
+  const member = await getMemberForSession(session.user.id)
+  if (!member) {
+    redirect('/auth/signin')
+  }
+
+  const data = buildDashboardViewModel(member)
+
   return (
     <div className="min-h-screen bg-warm-white">
       {/* Platform Nav */}
@@ -42,7 +35,7 @@ export default function DashboardPage() {
         <div className="flex items-center gap-6">
           <Link href="/platform/tools/resume" className="font-body text-white/70 hover:text-white text-sm transition-colors">Tools</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white text-sm transition-colors">Resources</Link>
-          <button className="font-body text-white/70 hover:text-white text-sm transition-colors">Sign Out</button>
+          <SignOutButton />
         </div>
       </nav>
 
@@ -50,34 +43,41 @@ export default function DashboardPage() {
 
         {/* Greeting */}
         <div className="mb-8">
-          <h1 className="font-display text-display-sm text-navy">Good Morning, {MOCK.name}.</h1>
-          <p className="font-body text-slate-supporting mt-1">Welcome back. Today is about progress, not perfection.</p>
+          <h1 className="font-display text-display-sm text-navy">Welcome back, {data.firstName}.</h1>
+          <p className="font-body text-slate-supporting mt-1">Today is about progress, not perfection.</p>
         </div>
+
+        {!data.hasAssessment && (
+          <div className="card bg-sage mb-8">
+            <p className="font-body text-navy mb-3">Complete your Rebuild Assessment to get your personalized plan.</p>
+            <Link href="/platform/assessment" className="btn-primary text-sm py-2 px-4 inline-block">Start Assessment</Link>
+          </div>
+        )}
 
         {/* Four Anchors — always at top */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <Anchor
             label="My Current Focus"
-            value={MOCK.currentFocus}
-            sub={`${STAGE_LABELS[MOCK.stage]} Stage`}
+            value={data.currentFocus}
+            sub={`${STAGE_LABELS[data.currentStage]} Stage`}
           />
           <Anchor
             label="My Next Step"
-            value={MOCK.nextAction.title}
-            sub={`Est. ${MOCK.nextAction.estimatedMinutes} min`}
-            action={{ label: 'Continue', href: MOCK.nextAction.url }}
+            value={data.nextAction.title}
+            sub={`Est. ${data.nextAction.estimatedMinutes} min`}
+            action={data.nextAction.url ? { label: 'Continue', href: data.nextAction.url } : undefined}
           />
           <Anchor
             label="My Financial Runway"
-            value={MOCK.financialRunway}
+            value={data.financialRunway}
             action={{ label: 'Update', href: '/platform/tools/income-strategy?tab=runway' }}
           />
           <div className="card">
             <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-2">My Rebuild Progress</p>
             <div className="progress-bar mb-2">
-              <div className="progress-fill" style={{ width: `${MOCK.progressPercent}%` }} />
+              <div className="progress-fill" style={{ width: `${data.progressPercent}%` }} />
             </div>
-            <p className="font-body text-sm text-navy font-medium">{MOCK.progressPercent}%</p>
+            <p className="font-body text-sm text-navy font-medium">{data.progressPercent}%</p>
             <p className="font-body text-slate-supporting text-xs mt-1">Every completed action advances your rebuild.</p>
           </div>
         </div>
@@ -88,30 +88,36 @@ export default function DashboardPage() {
           <div className="lg:col-span-2 space-y-6">
 
             {/* Today's Actions */}
-            <div className="card">
-              <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-4">Today's Actions</p>
-              <p className="font-body text-slate-supporting text-sm mb-4">Complete these in any order.</p>
-              <div className="space-y-3">
-                {MOCK.todayActions.map((action) => (
-                  <Link
-                    key={action.label}
-                    href={action.url}
-                    className="flex items-center gap-3 p-3 rounded-card border-2 border-sage hover:border-amber-hope transition-colors"
-                  >
-                    <div className={`w-5 h-5 rounded border-2 shrink-0 ${action.done ? 'bg-amber-hope border-amber-hope' : 'border-slate-supporting'}`} />
-                    <span className="font-body text-navy">{action.label}</span>
-                    <span className="ml-auto text-slate-supporting text-sm">→</span>
-                  </Link>
-                ))}
+            {data.todayActions.length > 0 && (
+              <div className="card">
+                <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-4">Today's Actions</p>
+                <p className="font-body text-slate-supporting text-sm mb-4">Complete these in any order.</p>
+                <div className="space-y-3">
+                  {data.todayActions.map(({ toolId, done }) => {
+                    const tool = TOOLS[toolId as ToolId]
+                    if (!tool) return null
+                    return (
+                      <Link
+                        key={toolId}
+                        href={tool.href}
+                        className="flex items-center gap-3 p-3 rounded-card border-2 border-sage hover:border-amber-hope transition-colors"
+                      >
+                        <div className={`w-5 h-5 rounded border-2 shrink-0 ${done ? 'bg-amber-hope border-amber-hope' : 'border-slate-supporting'}`} />
+                        <span className="font-body text-navy">{tool.label}</span>
+                        <span className="ml-auto text-slate-supporting text-sm">→</span>
+                      </Link>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* My Toolbox */}
             <div className="card">
               <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-4">My Toolbox</p>
               <div className="grid sm:grid-cols-2 gap-3">
-                {MOCK.activeTools.map((id) => {
-                  const tool = TOOLS[id]
+                {data.recommendedToolIds.map((id) => {
+                  const tool = TOOLS[id as ToolId]
                   if (!tool) return null
                   return (
                     <Link
@@ -131,11 +137,11 @@ export default function DashboardPage() {
             </div>
 
             {/* Wins */}
-            {MOCK.recentWins.length > 0 && (
+            {data.recentWins.length > 0 && (
               <div className="card">
                 <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Recent Wins</p>
                 <div className="space-y-2">
-                  {MOCK.recentWins.map((win) => (
+                  {data.recentWins.map((win) => (
                     <div key={win} className="flex items-center gap-3">
                       <span className="text-amber-hope">✓</span>
                       <span className="font-body text-navy text-sm">{win}</span>
@@ -153,9 +159,9 @@ export default function DashboardPage() {
             {/* Messages */}
             <div className="card">
               <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Messages</p>
-              {MOCK.unreadMessages > 0 ? (
+              {data.unreadMessages > 0 ? (
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="w-5 h-5 rounded-full bg-amber-hope text-white text-xs flex items-center justify-center font-bold">{MOCK.unreadMessages}</span>
+                  <span className="w-5 h-5 rounded-full bg-amber-hope text-white text-xs flex items-center justify-center font-bold">{data.unreadMessages}</span>
                   <span className="font-body text-navy text-sm">Unread messages</span>
                 </div>
               ) : (
@@ -176,7 +182,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Faith-based (optional) */}
-            {MOCK.faithBased && (
+            {data.faithBased && (
               <div className="card bg-sage border border-sage">
                 <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Prayer & Encouragement</p>
                 <p className="font-display text-navy text-sm italic mb-3">"I can do all things through Christ who strengthens me."</p>

@@ -87,19 +87,10 @@ Auth is fully scaffolded. Claude Code only needs to:
 - Wire `SessionProvider` into `src/app/layout.tsx`
 - Replace mock member data in dashboard with `getServerSession(authOptions)`
 
-**Sign-in page:** `/auth/signin` — Google button + email magic link ✅ BUILT
+**Sign-in page:** `/auth/signin` — email magic link only ✅ BUILT
 **Middleware:** protects all `/platform/*` routes ✅ BUILT
-**API route:** `/api/auth/[...nextauth]` — both providers configured ✅ BUILT
+**API route:** `/api/auth/[...nextauth]` — email provider configured ✅ BUILT
 **Email template:** branded magic link email ✅ BUILT
-
-**Google OAuth setup (one-time, 10 minutes):**
-1. Go to console.cloud.google.com
-2. New Project → APIs & Services → Credentials
-3. Create OAuth 2.0 Client ID → Web application
-4. Add authorized redirect URIs:
-   - `http://localhost:3000/api/auth/callback/google`
-   - `https://your-vercel-domain.com/api/auth/callback/google`
-5. Copy Client ID and Secret to Vercel env vars
 
 **Resend setup (magic link email):**
 1. Go to resend.com → create account (free)

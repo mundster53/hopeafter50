@@ -1,11 +1,10 @@
 // ============================================================
 // HopeAfter50 — NextAuth Configuration
-// Providers: Google OAuth + Email magic link (Resend)
+// Providers: Email magic link (Resend)
 // Adapter: Prisma (persists sessions and accounts to DB)
 // ============================================================
 
 import { NextAuthOptions } from 'next-auth'
-import GoogleProvider from 'next-auth/providers/google'
 import EmailProvider from 'next-auth/providers/email'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from '@/lib/db/client'
@@ -16,16 +15,6 @@ export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
 
   providers: [
-    // ----------------------------
-    // Google Sign-In — one click
-    // Setup: console.cloud.google.com → New Project → OAuth 2.0 Client
-    // Authorized redirect URI: https://yourdomain.com/api/auth/callback/google
-    // ----------------------------
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    }),
-
     // ----------------------------
     // Magic Link Email — via Resend
     // Member enters email → gets a link → clicks → signed in
