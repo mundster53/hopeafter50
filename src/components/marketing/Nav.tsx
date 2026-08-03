@@ -16,7 +16,7 @@ export default function Nav() {
           <Link href="/resources" className="font-body text-white/70 hover:text-white transition-colors text-sm">Resources</Link>
           <Link href="/platform/dashboard" className="font-body text-white/70 hover:text-white transition-colors text-sm">Sign In</Link>
           <Link href="/platform/assessment" className="btn-primary py-2 px-5 text-sm">
-            Start My Rebuild
+            Find My Next Step
           </Link>
         </div>
         <button
@@ -38,7 +38,7 @@ export default function Nav() {
           <Link href="/about" className="block font-body text-white/70 hover:text-white">About</Link>
           <Link href="/resources" className="block font-body text-white/70 hover:text-white">Resources</Link>
           <Link href="/platform/dashboard" className="block font-body text-white/70 hover:text-white">Sign In</Link>
-          <Link href="/platform/assessment" className="btn-primary block text-center">Start My Rebuild</Link>
+          <Link href="/platform/assessment" className="btn-primary block text-center">Find My Next Step</Link>
         </div>
       )}
     </nav>

@@ -58,7 +58,7 @@ function Hero() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4">
             <Link href="/platform/assessment" className="btn-primary text-center">
-              Start My Rebuild
+              Find My Next Step
             </Link>
           </div>
         </div>
@@ -309,7 +309,7 @@ function FinalCTA() {
           Let's take the next step together.
         </p>
         <Link href="/platform/assessment" className="btn-primary">
-          Start My Rebuild
+          Find My Next Step
         </Link>
       </div>
     </section>
