@@ -48,7 +48,7 @@ function Hero() {
           You're in the right place.
         </p>
         <p className="font-body text-xl text-white/80 leading-relaxed mb-12 max-w-2xl">
-          Hope After 50 exists to help experienced professionals rebuild after career
+          Hope After 50 exists to help people rebuild after career
           disruption with practical next steps, personalized tools, and renewed hope.
         </p>
         <Link href="/platform/assessment" className="btn-primary text-lg py-5 px-10">
