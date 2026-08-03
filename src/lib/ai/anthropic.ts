@@ -105,14 +105,53 @@ export async function runTextPrompt({
 function parseJsonResponse<T>(text: string): T {
   // Every prompt in /prompts instructs "Return valid JSON", but models
   // occasionally wrap the object in a ```json fence — strip it if present.
-  const cleaned = text
-    .trim()
-    .replace(/^```(?:json)?\s*/i, '')
-    .replace(/\s*```$/, '')
+  const candidate = extractJsonCandidate(text)
 
   try {
-    return JSON.parse(cleaned) as T
+    return JSON.parse(candidate) as T
   } catch (err) {
     throw new AiResponseParseError(text, err)
   }
+}
+
+/**
+ * Prompts instruct the model to "return valid JSON", but it sometimes wraps
+ * the object in a ```json fence and/or appends extra prose commentary after
+ * it despite that instruction. Extract just the JSON object rather than
+ * assuming the whole response is clean JSON.
+ */
+function extractJsonCandidate(text: string): string {
+  const trimmed = text.trim()
+
+  const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)\s*```/i)
+  if (fenced) return fenced[1].trim()
+
+  // No fence — fall back to a balanced-brace scan from the first "{" so
+  // trailing prose after the closing brace doesn't break JSON.parse. Tracks
+  // string/escape state so braces inside quoted values don't miscount.
+  const start = trimmed.indexOf('{')
+  if (start === -1) return trimmed
+
+  let depth = 0
+  let inString = false
+  let escaped = false
+
+  for (let i = start; i < trimmed.length; i++) {
+    const char = trimmed[i]
+
+    if (inString) {
+      if (escaped) escaped = false
+      else if (char === '\\') escaped = true
+      else if (char === '"') inString = false
+      continue
+    }
+
+    if (char === '"') inString = true
+    else if (char === '{') depth++
+    else if (char === '}') {
+      depth--
+      if (depth === 0) return trimmed.slice(start, i + 1)
+    }
+  }
+  return trimmed.slice(start)
 }
