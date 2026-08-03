@@ -33,7 +33,7 @@ export default async function DashboardPage() {
       <nav className="bg-navy border-b border-white/10 px-6 py-4 flex items-center justify-between">
         <Link href="/" className="font-display text-white font-bold text-lg">HopeAfter50</Link>
         <div className="flex items-center gap-6">
-          <Link href="/platform/tools/resume" className="font-body text-white/70 hover:text-white text-sm transition-colors">Tools</Link>
+          <Link href="/platform/tools" className="font-body text-white/70 hover:text-white text-sm transition-colors">Tools</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white text-sm transition-colors">Resources</Link>
           <SignOutButton />
         </div>

@@ -20,7 +20,21 @@ export const TOOLS: Record<ToolId, Tool> = {
     label: 'Cover Letter Builder',
     description: 'Generate tailored cover letters that reflect your voice and experience.',
     estimatedMinutes: 15,
-    href: '/platform/tools/resume?tab=cover-letter',
+    href: '/platform/tools/cover-letter',
+  },
+  opportunity_evaluator: {
+    id: 'opportunity_evaluator',
+    label: 'Opportunity Evaluator',
+    description: 'Evaluate a specific job opportunity against your experience before you apply.',
+    estimatedMinutes: 15,
+    href: '/platform/tools/opportunity',
+  },
+  weekly_review: {
+    id: 'weekly_review',
+    label: 'Weekly Review',
+    description: 'A short weekly check-in that keeps your Rebuild Plan and Dashboard current.',
+    estimatedMinutes: 10,
+    href: '/platform/tools/weekly-review',
   },
   interview_prep: {
     id: 'interview_prep',

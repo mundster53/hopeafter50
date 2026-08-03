@@ -201,6 +201,8 @@ export type ToolId =
   | 'fractional_planner'
   | 'financial_runway'
   | 'retirement_planner'
+  | 'opportunity_evaluator'
+  | 'weekly_review'
 
 export interface Tool {
   id: ToolId

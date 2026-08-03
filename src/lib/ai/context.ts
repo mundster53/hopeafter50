@@ -20,3 +20,21 @@ export async function getMemberAiContext(memberId: string) {
     assessment_analysis: member.assessment ?? {},
   }
 }
+
+/**
+ * Most tools that reference "the resume" (opportunity evaluation, cover
+ * letters, interview prep) need the member's latest resume text and its
+ * analysis. Returns nulls rather than inventing resume content if the
+ * member hasn't run the Resume Intelligence tool yet.
+ */
+export async function getLatestResumeContext(memberId: string) {
+  const analysis = await prisma.resumeAnalysis.findFirst({
+    where: { memberId },
+    orderBy: { createdAt: 'desc' },
+  })
+
+  return {
+    resumeText: analysis?.resumeText ?? '',
+    resumeAnalysis: (analysis?.analysis as unknown) ?? {},
+  }
+}
