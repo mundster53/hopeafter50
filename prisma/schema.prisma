@@ -82,6 +82,13 @@ model Member {
   rebuildPlan   RebuildPlan?
   weeklyCheckIns WeeklyCheckIn[]
   milestones    MemberMilestone[]
+
+  resumeAnalyses        ResumeAnalysis[]
+  resumeOptimizations   ResumeOptimization[]
+  opportunityEvaluations OpportunityEvaluation[]
+  coverLetters          CoverLetter[]
+  interviewPreps        InterviewPrep[]
+  linkedInOptimizations LinkedInOptimization[]
 }
 
 model Assessment {
@@ -130,6 +137,22 @@ model WeeklyCheckIn {
   rating      String
   comment     String?
   submittedAt DateTime @default(now())
+
+  // Structured Weekly Review inputs (prompts/weekly-review.md)
+  wins                     String? @db.Text
+  progressNotes            String? @db.Text
+  obstacles                String? @db.Text
+  applicationsSubmitted    Int     @default(0)
+  networkingConversations  Int     @default(0)
+  interviewsCompleted      Int     @default(0)
+  offersReceived           Int     @default(0)
+  newEmployment            Boolean @default(false)
+
+  // Full AI response JSON (progress_rating, momentum, wins, top_obstacles,
+  // current_focus, next_step, dashboard_updates, alerts, encouragement, ...)
+  aiResponse  Json?
+
+  @@unique([memberId, week])
 }
 
 model MemberMilestone {
@@ -140,4 +163,84 @@ model MemberMilestone {
   completedAt DateTime  @default(now())
 
   @@unique([memberId, milestoneId])
+}
+
+// ============================================================
+// AI Tools — each stores the member's input plus the full AI
+// JSON response (prompts/*.md). Never overwritten — kept as
+// history so members can compare versions over time.
+// ============================================================
+
+model ResumeAnalysis {
+  id               String   @id @default(cuid())
+  memberId         String
+  member           Member   @relation(fields: [memberId], references: [id])
+  resumeFileUrl    String?  // Vercel Blob URL of the uploaded file
+  resumeText       String   @db.Text
+  targetRoles      String[]
+  targetIndustries String[]
+  analysis         Json     // full prompts/resume-analysis.md output
+  atsRating        String?
+  overallRating    String?
+  createdAt        DateTime @default(now())
+}
+
+model ResumeOptimization {
+  id                     String          @id @default(cuid())
+  memberId               String
+  member                 Member          @relation(fields: [memberId], references: [id])
+  resumeAnalysisId       String?
+  optimizedResumeMarkdown String         @db.Text
+  majorChanges           String[]
+  recommendedFollowUp    String[]
+  confidence             String?
+  createdAt              DateTime        @default(now())
+}
+
+model OpportunityEvaluation {
+  id              String   @id @default(cuid())
+  memberId        String
+  member          Member   @relation(fields: [memberId], references: [id])
+  jobTitle        String
+  company         String
+  jobDescription  String   @db.Text
+  evaluation      Json     // full prompts/opportunity-evaluation.md output
+  fitScore        Int?
+  recommendation  String?
+  createdAt       DateTime @default(now())
+}
+
+model CoverLetter {
+  id                      String   @id @default(cuid())
+  memberId                String
+  member                  Member   @relation(fields: [memberId], references: [id])
+  opportunityEvaluationId String?
+  jobTitle                String
+  company                 String
+  coverLetterMarkdown     String   @db.Text
+  keyStrengths            String[]
+  customizations          String[]
+  confidence              String?
+  createdAt               DateTime @default(now())
+}
+
+model InterviewPrep {
+  id        String   @id @default(cuid())
+  memberId  String
+  member    Member   @relation(fields: [memberId], references: [id])
+  jobTitle  String
+  company   String
+  prep      Json     // full prompts/interview-prep.md output
+  createdAt DateTime @default(now())
+}
+
+model LinkedInOptimization {
+  id          String   @id @default(cuid())
+  memberId    String
+  member      Member   @relation(fields: [memberId], references: [id])
+  headline    String?  @db.Text
+  about       String?  @db.Text
+  experience  String?  @db.Text
+  analysis    Json     // AI response, based on prompts/resume-analysis.md guidance
+  createdAt   DateTime @default(now())
 }
