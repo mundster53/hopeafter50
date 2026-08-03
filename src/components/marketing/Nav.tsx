@@ -9,7 +9,7 @@ export default function Nav() {
     <nav className="bg-navy border-b border-white/10 sticky top-0 z-50">
       <div className="max-wide mx-auto px-6 py-4 flex items-center justify-between">
         <Link href="/" className="font-display text-xl text-white font-bold tracking-tight">
-          HopeAfter50
+          Hope After 50
         </Link>
         <div className="hidden md:flex items-center gap-8">
           <Link href="/about" className="font-body text-white/70 hover:text-white transition-colors text-sm">About</Link>

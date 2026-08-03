@@ -31,37 +31,29 @@ export default function HomePage() {
 // ----------------------------
 function Hero() {
   return (
-    <section className="bg-navy text-warm-white section-padding min-h-screen flex items-center">
-      <div className="max-wide w-full mx-auto">
-        <div className="max-w-2xl mx-auto">
-          <p className="text-amber-hope font-body font-medium text-sm tracking-widest uppercase mb-6">
-            HopeAfter50
-          </p>
-          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight">
-            You spent decades<br />
-            building your career.
-          </h1>
-          <p className="font-display text-2xl md:text-3xl text-amber-hope mb-8">
-            You shouldn't have to rebuild your future alone.
-          </p>
-          <p className="font-body text-xl text-white/80 mb-4 max-w-lg leading-relaxed">
-            If you've unexpectedly lost the career you spent years building and you're
-            wondering how you'll replace your income, rebuild your confidence, and
-            eventually retire...
-          </p>
-          <p className="font-body text-2xl font-semibold text-white mb-10">
-            You're in the right place.
-          </p>
-          <p className="font-body text-xl text-white/90 mb-12 max-w-lg">
-            HopeAfter50 exists to help experienced professionals rebuild after career
-            disruption with practical next steps, personalized tools, and renewed hope.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4">
-            <Link href="/platform/assessment" className="btn-primary text-center">
-              Find My Next Step
-            </Link>
-          </div>
-        </div>
+    <section className="min-h-screen bg-navy flex items-center py-20 px-6">
+      <div className="max-w-3xl mx-auto">
+        <h1 className="font-display text-6xl md:text-7xl text-white leading-tight mb-6">
+          You spent decades building your career.
+        </h1>
+        <p className="font-display text-3xl md:text-4xl text-amber-hope leading-snug mb-10">
+          You shouldn't have to rebuild your future alone.
+        </p>
+        <p className="font-body text-2xl text-white/90 leading-relaxed mb-6 max-w-2xl">
+          If you've unexpectedly lost the career you spent years building and you're
+          wondering how you'll replace your income, rebuild your confidence, and
+          eventually retire...
+        </p>
+        <p className="font-display text-3xl text-white font-semibold mb-10">
+          You're in the right place.
+        </p>
+        <p className="font-body text-xl text-white/80 leading-relaxed mb-12 max-w-2xl">
+          Hope After 50 exists to help experienced professionals rebuild after career
+          disruption with practical next steps, personalized tools, and renewed hope.
+        </p>
+        <Link href="/platform/assessment" className="btn-primary text-lg py-5 px-10">
+          Find My Next Step
+        </Link>
       </div>
     </section>
   )
