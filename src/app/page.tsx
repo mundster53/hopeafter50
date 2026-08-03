@@ -52,7 +52,7 @@ function Hero() {
           <p className="font-body text-2xl font-semibold text-white mb-10">
             You're in the right place.
           </p>
-          <p className="font-body text-lg text-white/70 mb-12 max-w-lg">
+          <p className="font-body text-xl text-white/90 mb-12 max-w-lg">
             HopeAfter50 exists to help experienced professionals rebuild after career
             disruption with practical next steps, personalized tools, and renewed hope.
           </p>
