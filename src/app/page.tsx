@@ -31,17 +31,17 @@ export default function HomePage() {
 // ----------------------------
 function Hero() {
   return (
-    <section className="bg-navy text-warm-white section-padding min-h-[90vh] flex items-center">
+    <section className="bg-navy text-warm-white section-padding min-h-screen flex items-center">
       <div className="max-wide w-full mx-auto">
         <div className="max-w-2xl mx-auto">
           <p className="text-amber-hope font-body font-medium text-sm tracking-widest uppercase mb-6">
             HopeAfter50
           </p>
-          <h1 className="font-display text-display-lg mb-6 leading-tight">
+          <h1 className="font-display text-5xl md:text-6xl lg:text-7xl mb-6 leading-tight">
             You spent decades<br />
             building your career.
           </h1>
-          <p className="font-display text-display-sm text-amber-hope mb-8">
+          <p className="font-display text-2xl md:text-3xl text-amber-hope mb-8">
             You shouldn't have to rebuild your future alone.
           </p>
           <p className="font-body text-lg text-white/80 mb-4 max-w-lg leading-relaxed">
