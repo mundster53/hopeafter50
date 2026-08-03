@@ -264,6 +264,7 @@ export const ALL_MILESTONES: Omit<Milestone, 'completedAt'>[] = [
   { id: 'resume_uploaded', label: 'Resume Uploaded' },
   { id: 'resume_optimized', label: 'Resume Optimized' },
   { id: 'linkedin_updated', label: 'LinkedIn Updated' },
+  { id: 'cover_letter_generated', label: 'Cover Letter Generated' },
   { id: 'first_interview', label: 'First Interview' },
   { id: 'second_interview', label: 'Second Interview' },
   { id: 'first_consulting_conversation', label: 'First Consulting Conversation' },
