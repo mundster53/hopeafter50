@@ -54,7 +54,7 @@ function Hero() {
         <Link href="/platform/assessment" className="btn-primary text-lg py-5 px-10">
           Find My Next Step
         </Link>
-        <p className="font-body text-sm text-white/60 mt-4">
+        <p className="font-body text-lg text-white font-semibold mt-6">
           Free for every professional who needs it.
         </p>
       </div>
