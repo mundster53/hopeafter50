@@ -19,6 +19,9 @@ export default function Footer() {
           ))}
         </div>
       </div>
+      <p className="max-wide mx-auto mt-6 pt-6 border-t border-white/10 font-body text-amber-hope text-xs text-center">
+        The official HopeAfter50 ministry is only at hopeafter50.org
+      </p>
     </footer>
   )
 }

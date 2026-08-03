@@ -16,12 +16,17 @@ const playfair = Playfair_Display({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://hopeafter50.org'),
   title: 'HopeAfter50 — Rebuild After Career Disruption',
   description:
     'Practical tools, personalized plans, and renewed hope for experienced professionals rebuilding after career disruption.',
+  alternates: {
+    canonical: 'https://hopeafter50.org',
+  },
   openGraph: {
     title: 'HopeAfter50',
     description: 'You spent decades building your career. You shouldn\'t have to rebuild your future alone.',
+    url: 'https://hopeafter50.org',
     type: 'website',
   },
 }
