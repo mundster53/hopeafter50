@@ -55,7 +55,7 @@ function Hero() {
           Find My Next Step
         </Link>
         <p className="font-body text-lg text-white font-semibold mt-6">
-          Free for every professional who needs it.
+          Free for everyone who needs it.
         </p>
       </div>
     </section>
