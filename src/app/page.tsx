@@ -44,15 +44,15 @@ function Hero() {
           <p className="font-display text-2xl md:text-3xl text-amber-hope mb-8">
             You shouldn't have to rebuild your future alone.
           </p>
-          <p className="font-body text-lg text-white/80 mb-4 max-w-lg leading-relaxed">
+          <p className="font-body text-xl text-white/80 mb-4 max-w-lg leading-relaxed">
             If you've unexpectedly lost the career you spent years building and you're
             wondering how you'll replace your income, rebuild your confidence, and
             eventually retire...
           </p>
-          <p className="font-body text-xl text-white font-medium mb-10">
+          <p className="font-body text-2xl font-semibold text-white mb-10">
             You're in the right place.
           </p>
-          <p className="font-body text-white/70 mb-12 max-w-lg">
+          <p className="font-body text-lg text-white/70 mb-12 max-w-lg">
             HopeAfter50 exists to help experienced professionals rebuild after career
             disruption with practical next steps, personalized tools, and renewed hope.
           </p>
