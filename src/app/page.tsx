@@ -85,7 +85,7 @@ function WeUnderstand() {
         <div className="space-y-4 mb-10">
           <p className="font-body text-lg text-navy">You spent decades becoming good at what you do.</p>
           <p className="font-body text-lg text-navy">Then one day — everything changed.</p>
-          <p className="font-body text-slate-supporting">
+          <p className="font-body text-navy">
             Maybe it was a layoff. Maybe your position disappeared. Maybe the company changed.
           </p>
           <p className="font-body text-lg text-navy font-medium">Whatever happened — you now find yourself asking questions you never expected to ask.</p>
@@ -97,7 +97,7 @@ function WeUnderstand() {
         </div>
         <div className="bg-sage rounded-card p-6">
           <p className="font-display text-display-sm text-navy mb-2">You're not alone.</p>
-          <p className="font-body text-slate-supporting text-lg">And you're not without options.</p>
+          <p className="font-body text-navy text-lg">And you're not without options.</p>
         </div>
       </div>
     </section>
