@@ -28,10 +28,10 @@ export default async function DashboardPage() {
   const data = buildDashboardViewModel(member)
 
   return (
-    <div className="min-h-screen bg-warm-white">
+    <div className="min-h-screen bg-navy">
       {/* Platform Nav */}
       <nav className="bg-navy border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="font-display text-white font-bold text-lg">HopeAfter50</Link>
+        <Link href="/" className="font-display text-white font-bold text-lg">Hope After 50</Link>
         <div className="flex items-center gap-6">
           <Link href="/platform/tools" className="font-body text-white/70 hover:text-white text-sm transition-colors">Tools</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white text-sm transition-colors">Resources</Link>
@@ -43,14 +43,21 @@ export default async function DashboardPage() {
 
         {/* Greeting */}
         <div className="mb-8">
-          <h1 className="font-display text-display-sm text-navy">Welcome back, {data.firstName}.</h1>
-          <p className="font-body text-slate-supporting mt-1">Today is about progress, not perfection.</p>
+          <h1 className="font-display text-display-sm text-white">{data.firstName ? `Welcome back, ${data.firstName}` : 'Welcome'}</h1>
+          <p className="font-body text-white/70 mt-1">We're glad you're here. Let's take the next step together.</p>
         </div>
 
         {!data.hasAssessment && (
-          <div className="card bg-sage mb-8">
-            <p className="font-body text-navy mb-3">Complete your Rebuild Assessment to get your personalized plan.</p>
-            <Link href="/platform/assessment" className="btn-primary text-sm py-2 px-4 inline-block">Start Assessment</Link>
+          <div className="bg-amber-hope text-white rounded-card p-8 md:p-12 mb-8">
+            <h2 className="font-display text-display-md mb-4">Help us understand what you're feeling.</h2>
+            <p className="font-body text-white/90 text-lg mb-8 max-w-2xl">
+              Tell us where you are emotionally, what you're going through, and what you need right now.
+              We'll use that to build a plan that gives you hope and a path forward.
+            </p>
+            <Link href="/platform/assessment" className="inline-block bg-white text-navy font-body font-semibold px-8 py-4 rounded-card text-lg hover:bg-white/90 transition-colors">
+              I'm ready — let's do this
+            </Link>
+            <p className="font-body text-white/70 text-sm mt-4">Takes about 5 minutes. No wrong answers.</p>
           </div>
         )}
 
@@ -72,13 +79,13 @@ export default async function DashboardPage() {
             value={data.financialRunway}
             action={{ label: 'Update', href: '/platform/tools/income-strategy?tab=runway' }}
           />
-          <div className="card">
-            <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-2">My Rebuild Progress</p>
+          <div className="bg-white/5 rounded-card p-6">
+            <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-2">My Rebuild Progress</p>
             <div className="progress-bar mb-2">
               <div className="progress-fill" style={{ width: `${data.progressPercent}%` }} />
             </div>
-            <p className="font-body text-sm text-navy font-medium">{data.progressPercent}%</p>
-            <p className="font-body text-slate-supporting text-xs mt-1">Every completed action advances your rebuild.</p>
+            <p className="font-body text-sm text-white font-medium">{data.progressPercent}%</p>
+            <p className="font-body text-white/70 text-xs mt-1">Every completed action advances your rebuild.</p>
           </div>
         </div>
 
@@ -89,9 +96,9 @@ export default async function DashboardPage() {
 
             {/* Today's Actions */}
             {data.todayActions.length > 0 && (
-              <div className="card">
-                <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-4">Today's Actions</p>
-                <p className="font-body text-slate-supporting text-sm mb-4">Complete these in any order.</p>
+              <div className="bg-white/5 rounded-card p-6">
+                <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-4">Today's Actions</p>
+                <p className="font-body text-white/70 text-sm mb-4">Complete these in any order.</p>
                 <div className="space-y-3">
                   {data.todayActions.map(({ toolId, done }) => {
                     const tool = TOOLS[toolId as ToolId]
@@ -100,11 +107,11 @@ export default async function DashboardPage() {
                       <Link
                         key={toolId}
                         href={tool.href}
-                        className="flex items-center gap-3 p-3 rounded-card border-2 border-sage hover:border-amber-hope transition-colors"
+                        className="flex items-center gap-3 p-3 rounded-card border-2 border-white/10 hover:border-amber-hope transition-colors"
                       >
-                        <div className={`w-5 h-5 rounded border-2 shrink-0 ${done ? 'bg-amber-hope border-amber-hope' : 'border-slate-supporting'}`} />
-                        <span className="font-body text-navy">{tool.label}</span>
-                        <span className="ml-auto text-slate-supporting text-sm">→</span>
+                        <div className={`w-5 h-5 rounded border-2 shrink-0 ${done ? 'bg-amber-hope border-amber-hope' : 'border-white/40'}`} />
+                        <span className="font-body text-white">{tool.label}</span>
+                        <span className="ml-auto text-white/70 text-sm">→</span>
                       </Link>
                     )
                   })}
@@ -113,8 +120,8 @@ export default async function DashboardPage() {
             )}
 
             {/* My Toolbox */}
-            <div className="card">
-              <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-4">My Toolbox</p>
+            <div className="bg-white/5 rounded-card p-6">
+              <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-4">My Toolbox</p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {data.recommendedToolIds.map((id) => {
                   const tool = TOOLS[id as ToolId]
@@ -123,12 +130,12 @@ export default async function DashboardPage() {
                     <Link
                       key={id}
                       href={tool.href}
-                      className="flex items-start gap-3 p-4 rounded-card bg-sage hover:bg-amber-pale transition-colors"
+                      className="flex items-start gap-3 p-4 rounded-card bg-white/5 hover:bg-white/10 transition-colors"
                     >
                       <div className="w-2 h-2 rounded-full bg-amber-hope mt-2 shrink-0" />
                       <div>
-                        <p className="font-body text-navy font-medium text-sm">{tool.label}</p>
-                        <p className="font-body text-slate-supporting text-xs mt-0.5">{tool.estimatedMinutes} min</p>
+                        <p className="font-body text-white font-medium text-sm">{tool.label}</p>
+                        <p className="font-body text-white/70 text-xs mt-0.5">{tool.estimatedMinutes} min</p>
                       </div>
                     </Link>
                   )
@@ -138,13 +145,13 @@ export default async function DashboardPage() {
 
             {/* Wins */}
             {data.recentWins.length > 0 && (
-              <div className="card">
-                <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Recent Wins</p>
+              <div className="bg-white/5 rounded-card p-6">
+                <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-3">Recent Wins</p>
                 <div className="space-y-2">
                   {data.recentWins.map((win) => (
                     <div key={win} className="flex items-center gap-3">
                       <span className="text-amber-hope">✓</span>
-                      <span className="font-body text-navy text-sm">{win}</span>
+                      <span className="font-body text-white text-sm">{win}</span>
                     </div>
                   ))}
                 </div>
@@ -157,23 +164,23 @@ export default async function DashboardPage() {
           <div className="space-y-6">
 
             {/* Messages */}
-            <div className="card">
-              <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Messages</p>
+            <div className="bg-white/5 rounded-card p-6">
+              <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-3">Messages</p>
               {data.unreadMessages > 0 ? (
                 <div className="flex items-center gap-2 mb-3">
                   <span className="w-5 h-5 rounded-full bg-amber-hope text-white text-xs flex items-center justify-center font-bold">{data.unreadMessages}</span>
-                  <span className="font-body text-navy text-sm">Unread messages</span>
+                  <span className="font-body text-white text-sm">Unread messages</span>
                 </div>
               ) : (
-                <p className="font-body text-slate-supporting text-sm mb-3">No unread messages.</p>
+                <p className="font-body text-white/70 text-sm mb-3">No unread messages.</p>
               )}
               <Link href="/platform/messages" className="btn-primary text-sm py-2 px-4 inline-block">Open Inbox</Link>
             </div>
 
             {/* My Guide */}
-            <div className="card">
-              <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">My Guide</p>
-              <p className="font-body text-slate-supporting text-sm mb-3">Need to ask a question?</p>
+            <div className="bg-white/5 rounded-card p-6">
+              <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-3">My Guide</p>
+              <p className="font-body text-white/70 text-sm mb-3">Need to ask a question?</p>
               <div className="space-y-2">
                 <Link href="/platform/messages" className="block font-body text-amber-hope text-sm hover:underline">Message our team</Link>
                 <Link href="/platform/ai" className="block font-body text-amber-hope text-sm hover:underline">Ask AI</Link>
@@ -183,9 +190,9 @@ export default async function DashboardPage() {
 
             {/* Faith-based (optional) */}
             {data.faithBased && (
-              <div className="card bg-sage border border-sage">
-                <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Prayer & Encouragement</p>
-                <p className="font-display text-navy text-sm italic mb-3">"I can do all things through Christ who strengthens me."</p>
+              <div className="bg-white/5 rounded-card p-6 border border-white/10">
+                <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-3">Prayer & Encouragement</p>
+                <p className="font-display text-white text-sm italic mb-3">"I can do all things through Christ who strengthens me."</p>
                 <div className="space-y-1">
                   <Link href="/platform/community?tab=prayer" className="block font-body text-amber-hope text-sm hover:underline">Prayer Requests</Link>
                   <Link href="/platform/community?tab=praise" className="block font-body text-amber-hope text-sm hover:underline">Praise Reports</Link>
@@ -195,9 +202,9 @@ export default async function DashboardPage() {
             )}
 
             {/* Learning Center */}
-            <div className="card">
-              <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Learning Center</p>
-              <p className="font-body text-slate-supporting text-xs mb-3">Recommended for you</p>
+            <div className="bg-white/5 rounded-card p-6">
+              <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-3">Learning Center</p>
+              <p className="font-body text-white/70 text-xs mb-3">Recommended for you</p>
               <div className="space-y-2">
                 {['AI Resume Guide', 'Networking Strategies', 'Executive Interview Prep', 'Financial Recovery'].map((r) => (
                   <Link key={r} href="/resources" className="block font-body text-amber-hope text-sm hover:underline">{r}</Link>
@@ -209,12 +216,12 @@ export default async function DashboardPage() {
         </div>
 
         {/* Footer */}
-        <div className="mt-10 pt-6 border-t border-sage flex flex-wrap gap-6 text-sm">
-          <Link href="/help" className="font-body text-slate-supporting hover:text-navy">Need Help?</Link>
-          <Link href="/platform/messages" className="font-body text-slate-supporting hover:text-navy">Message Us</Link>
-          <Link href="/schedule" className="font-body text-slate-supporting hover:text-navy">Schedule a Conversation</Link>
-          <Link href="/resources" className="font-body text-slate-supporting hover:text-navy">Resources</Link>
-          <Link href="/privacy-policy" className="font-body text-slate-supporting hover:text-navy">Privacy</Link>
+        <div className="mt-10 pt-6 border-t border-white/10 flex flex-wrap gap-6 text-sm">
+          <Link href="/help" className="font-body text-white/70 hover:text-white">Need Help?</Link>
+          <Link href="/platform/messages" className="font-body text-white/70 hover:text-white">Message Us</Link>
+          <Link href="/schedule" className="font-body text-white/70 hover:text-white">Schedule a Conversation</Link>
+          <Link href="/resources" className="font-body text-white/70 hover:text-white">Resources</Link>
+          <Link href="/privacy-policy" className="font-body text-white/70 hover:text-white">Privacy</Link>
         </div>
 
       </div>
@@ -229,10 +236,10 @@ function Anchor({ label, value, sub, action }: {
   action?: { label: string; href: string }
 }) {
   return (
-    <div className="card">
-      <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-2">{label}</p>
-      <p className="font-display text-lg text-navy font-medium mb-1">{value}</p>
-      {sub && <p className="font-body text-slate-supporting text-xs mb-3">{sub}</p>}
+    <div className="bg-white/5 rounded-card p-6">
+      <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-2">{label}</p>
+      <p className="font-display text-lg text-white font-medium mb-1">{value}</p>
+      {sub && <p className="font-body text-white/70 text-xs mb-3">{sub}</p>}
       {action && (
         <Link href={action.href} className="font-body text-amber-hope text-sm font-medium hover:underline">
           {action.label} →

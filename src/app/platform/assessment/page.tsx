@@ -163,14 +163,16 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
   ]
 
   return (
-    <div>
-      <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4">Rebuild Assessment</p>
-      <h1 className="font-display text-display-md text-navy mb-6">
-        Before we build your plan, we want to understand where you are.
+    <div className="bg-navy rounded-card px-6 py-12 md:px-12">
+      <h1 className="font-display text-display-md text-white mb-4">
+        Help us understand what you're feeling.
       </h1>
-      <p className="font-body text-slate-supporting mb-8">
-        Take a breath. There are no wrong answers here. Everything you share helps us build something
-        that actually fits your situation.
+      <p className="font-display text-xl text-amber-hope mb-6">
+        Where you are emotionally, what you're going through, and what you need right now.
+      </p>
+      <p className="font-body text-white/80 mb-8">
+        There are no wrong answers here. Everything you share helps us build something that actually
+        fits your situation — a real plan with real next steps.
       </p>
       <ul className="space-y-3 mb-8">
         {reassurances.map((item) => (
@@ -183,7 +185,7 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <span className="font-body text-navy/80">{item}</span>
+            <span className="font-body text-amber-hope">{item}</span>
           </li>
         ))}
       </ul>
