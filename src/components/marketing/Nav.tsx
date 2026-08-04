@@ -1,9 +1,14 @@
-'use client'
 import Link from 'next/link'
-import { useState } from 'react'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import NavMobileMenu from './NavMobileMenu'
 
-export default function Nav() {
-  const [open, setOpen] = useState(false)
+export default async function Nav() {
+  const session = await getServerSession(authOptions)
+  const isLoggedIn = !!session
+  const ctaLabel = isLoggedIn ? 'Go to My Dashboard' : 'Find My Next Step'
+  const ctaHref = isLoggedIn ? '/platform/dashboard' : '/auth/signin'
+  const dashboardLinkLabel = isLoggedIn ? 'My Dashboard' : 'Sign In'
 
   return (
     <nav className="bg-navy border-b border-white/10 sticky top-0 z-50">
@@ -14,33 +19,13 @@ export default function Nav() {
         <div className="hidden md:flex items-center gap-8">
           <Link href="/about" className="font-body text-white/70 hover:text-white transition-colors text-sm">About</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white transition-colors text-sm">Resources</Link>
-          <Link href="/platform/dashboard" className="font-body text-white/70 hover:text-white transition-colors text-sm">Sign In</Link>
-          <Link href="/platform/assessment" className="btn-primary py-2 px-5 text-sm">
-            Find My Next Step
+          <Link href="/platform/dashboard" className="font-body text-white/70 hover:text-white transition-colors text-sm">{dashboardLinkLabel}</Link>
+          <Link href={ctaHref} className="btn-primary py-2 px-5 text-sm">
+            {ctaLabel}
           </Link>
         </div>
-        <button
-          className="md:hidden text-white"
-          onClick={() => setOpen(!open)}
-          aria-label="Toggle menu"
-        >
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            {open ? (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            ) : (
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            )}
-          </svg>
-        </button>
+        <NavMobileMenu dashboardLinkLabel={dashboardLinkLabel} ctaLabel={ctaLabel} ctaHref={ctaHref} />
       </div>
-      {open && (
-        <div className="md:hidden bg-navy border-t border-white/10 px-6 py-4 space-y-4">
-          <Link href="/about" className="block font-body text-white/70 hover:text-white">About</Link>
-          <Link href="/resources" className="block font-body text-white/70 hover:text-white">Resources</Link>
-          <Link href="/platform/dashboard" className="block font-body text-white/70 hover:text-white">Sign In</Link>
-          <Link href="/platform/assessment" className="btn-primary block text-center">Find My Next Step</Link>
-        </div>
-      )}
     </nav>
   )
 }

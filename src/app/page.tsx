@@ -5,21 +5,28 @@
 // ============================================================
 
 import Link from 'next/link'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import Nav from '@/components/marketing/Nav'
 import Footer from '@/components/marketing/Footer'
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await getServerSession(authOptions)
+  const isLoggedIn = !!session
+  const ctaLabel = isLoggedIn ? 'Go to My Dashboard' : 'Find My Next Step'
+  const ctaHref = isLoggedIn ? '/platform/dashboard' : '/auth/signin'
+
   return (
     <>
       <Nav />
       <main>
-        <Hero />
+        <Hero ctaLabel={ctaLabel} ctaHref={ctaHref} />
         <WeUnderstand />
         <WhatWeDo />
         <WhatHappensNext />
         <AreasWeHelp />
         <OurPromise />
-        <FinalCTA />
+        <FinalCTA ctaLabel={ctaLabel} ctaHref={ctaHref} />
       </main>
       <Footer />
     </>
@@ -29,7 +36,7 @@ export default function HomePage() {
 // ----------------------------
 // Hero
 // ----------------------------
-function Hero() {
+function Hero({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }) {
   return (
     <section className="relative min-h-screen bg-navy flex items-center py-20 px-6">
       <div className="max-w-3xl mx-auto">
@@ -51,8 +58,8 @@ function Hero() {
           Hope After 50 exists to help people rebuild after career
           disruption with practical next steps, personalized tools, and renewed hope.
         </p>
-        <Link href="/platform/assessment" className="btn-primary text-lg py-5 px-10">
-          Find My Next Step
+        <Link href={ctaHref} className="btn-primary text-lg py-5 px-10">
+          {ctaLabel}
         </Link>
         <p className="font-body text-lg text-white font-semibold mt-6">
           Free for everyone who needs it.
@@ -297,7 +304,7 @@ function OurPromise() {
 // ----------------------------
 // Final CTA
 // ----------------------------
-function FinalCTA() {
+function FinalCTA({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }) {
   return (
     <section className="bg-warm-white section-padding text-center">
       <div className="max-content mx-auto">
@@ -310,8 +317,8 @@ function FinalCTA() {
         <p className="font-display text-xl text-navy mb-10">
           Let's take the next step together.
         </p>
-        <Link href="/platform/assessment" className="btn-primary">
-          Find My Next Step
+        <Link href={ctaHref} className="btn-primary">
+          {ctaLabel}
         </Link>
       </div>
     </section>
