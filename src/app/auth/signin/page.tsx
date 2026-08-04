@@ -28,9 +28,9 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-warm-white">
+    <div className="min-h-screen bg-navy">
       <div className="max-w-2xl mx-auto px-6 py-20 lg:py-28">
-        <Link href="/" className="font-display font-bold text-lg text-navy">Hope After 50</Link>
+        <Link href="/" className="font-display font-bold text-lg text-white">Hope After 50</Link>
 
         {sent ? (
           <div className="card text-center mt-12">
@@ -52,7 +52,7 @@ export default function SignInPage() {
           </div>
         ) : (
           <>
-            <h1 className="font-display text-display-md text-navy mt-10 mb-4">
+            <h1 className="font-display text-display-md text-white mt-10 mb-4">
               You just did something hard.
             </h1>
             <p className="font-body text-amber-hope text-lg">
@@ -70,26 +70,26 @@ export default function SignInPage() {
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span className="font-body text-navy">{item}</span>
+                  <span className="font-body text-white/80">{item}</span>
                 </li>
               ))}
             </ul>
 
-            <div className="h-px bg-sage mt-12 mb-12" />
+            <div className="h-px bg-white/10 mt-12 mb-12" />
 
             <p className="font-body text-amber-hope text-sm font-semibold uppercase tracking-wide mb-3">
               Let&rsquo;s get started
             </p>
-            <h2 className="font-display text-display-sm text-navy mb-3">
+            <h2 className="font-display text-display-sm text-white mb-3">
               Where should we send your plan?
             </h2>
-            <p className="font-body text-slate-supporting mb-8">
+            <p className="font-body text-white/80 mb-8">
               Enter your email and we&rsquo;ll send you a secure sign-in link. No password needed.
             </p>
 
             <form onSubmit={handleEmailSignIn} className="space-y-3">
               <div>
-                <label className="font-body text-sm text-slate-supporting mb-1 block">
+                <label className="font-body text-sm text-white/80 mb-1 block">
                   Your email address
                 </label>
                 <input
@@ -98,7 +98,7 @@ export default function SignInPage() {
                   onChange={e => setEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope"
+                  className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
                 />
               </div>
               <button
@@ -110,14 +110,14 @@ export default function SignInPage() {
               </button>
             </form>
 
-            <p className="font-body text-slate-supporting text-sm mt-4">
+            <p className="font-body text-white/50 text-sm mt-4">
               We&rsquo;ll never share your email or send you anything you didn&rsquo;t ask for.
             </p>
 
             <div className="flex items-center gap-4 my-8">
-              <div className="flex-1 h-px bg-sage" />
-              <span className="font-body text-slate-light text-sm">or</span>
-              <div className="flex-1 h-px bg-sage" />
+              <div className="flex-1 h-px bg-white/10" />
+              <span className="font-body text-white/30 text-sm">or</span>
+              <div className="flex-1 h-px bg-white/10" />
             </div>
 
             <p className="font-body text-center">
@@ -126,7 +126,7 @@ export default function SignInPage() {
               </Link>
             </p>
 
-            <p className="font-body text-slate-supporting text-sm text-center mt-16">
+            <p className="font-body text-white/50 text-sm text-center mt-16">
               Free for everyone who needs it. No pressure. No catch.
             </p>
           </>
