@@ -1,5 +1,25 @@
 # Foundation
 
+## The Overriding Feeling
+
+Every page, every word, every tool, every interaction — one feeling must come through above all others:
+
+**Someone cares.**
+
+Not a platform. Not a product. Not an algorithm. A person who has been where you are, who built this because he knows what it feels like to wonder if it's going to be ok, and who wants you to know — it is going to be ok.
+
+Every design decision, every line of copy, every AI response, every email, every notification must be filtered through this question:
+
+**Does this feel like someone who cares wrote it?**
+
+If the answer is no — rewrite it.
+
+The ministry is not here to impress anyone. It is here to love people through one of the hardest seasons of their lives. That love shows up in practical help, honest guidance, and the quiet reassurance that they are not alone and they are not forgotten.
+
+Care is not a feature. It is the foundation.
+
+---
+
 This ministry points to God through action, not proclamation. Every feature, every word, every interaction should demonstrate care. The platform never preaches. It serves.
 
 ---
