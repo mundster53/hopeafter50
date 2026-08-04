@@ -78,19 +78,19 @@ export default function SignInPage() {
             <div className="h-px bg-white/10 mt-12 mb-12" />
 
             <p className="font-body text-amber-hope text-sm font-semibold uppercase tracking-wide mb-3">
-              Let&rsquo;s get started
+              Your personalized plan
             </p>
             <h2 className="font-display text-display-sm text-white mb-3">
-              Where should we send your plan?
+              Here&rsquo;s what happens next.
             </h2>
             <p className="font-body text-white/80 mb-8">
-              Enter your email and we&rsquo;ll send you a secure sign-in link. No password needed.
+              In the next few minutes you&rsquo;ll receive a personalized Rebuild Plan — practical next steps built around your specific situation. Enter your email and we&rsquo;ll send you a secure link to get started. No password needed.
             </p>
 
             <form onSubmit={handleEmailSignIn} className="space-y-3">
               <div>
                 <label className="font-body text-sm text-white/80 mb-1 block">
-                  Your email address
+                  Where should we send your plan?
                 </label>
                 <input
                   type="email"
