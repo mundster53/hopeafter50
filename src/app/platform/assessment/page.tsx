@@ -156,18 +156,38 @@ function QuestionNote({ children }: { children: React.ReactNode }) {
 // Welcome
 // ----------------------------
 function WelcomeStep({ onNext }: { onNext: () => void }) {
+  const reassurances = [
+    'Nothing you don’t already know the answer to',
+    'Takes about 5 minutes',
+    'Your plan is ready the moment you finish',
+  ]
+
   return (
     <div>
       <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4">Rebuild Assessment</p>
       <h1 className="font-display text-display-md text-navy mb-6">
-        Let's build your personalized Rebuild Plan.
+        Before we build your plan, we want to understand where you are.
       </h1>
-      <div className="space-y-3 mb-8 font-body text-navy/80">
-        <p>This isn't a personality test. It's not a survey.</p>
-        <p>Every question helps us recommend the next best step.</p>
-        <p className="font-medium text-navy">Most people finish in about 5 minutes.</p>
-      </div>
-      <button onClick={onNext} className="btn-primary">Begin Assessment →</button>
+      <p className="font-body text-slate-supporting mb-8">
+        Take a breath. There are no wrong answers here. Everything you share helps us build something
+        that actually fits your situation.
+      </p>
+      <ul className="space-y-3 mb-8">
+        {reassurances.map((item) => (
+          <li key={item} className="flex items-start gap-3">
+            <svg
+              className="w-5 h-5 text-amber-hope flex-shrink-0 mt-0.5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
+            <span className="font-body text-navy/80">{item}</span>
+          </li>
+        ))}
+      </ul>
+      <button onClick={onNext} className="btn-primary">I&rsquo;m ready — let&rsquo;s do this</button>
     </div>
   )
 }

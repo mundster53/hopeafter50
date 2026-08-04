@@ -8,10 +8,31 @@ import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import Link from 'next/link'
 
-const EXPECTATIONS = [
-  'Answer a few questions about where you are right now. About 5 minutes.',
-  'Receive your personalized plan immediately. Not generic advice — a real plan built around your situation.',
-  'Get practical next steps, AI-powered tools, and someone in your corner.',
+const STEPS = [
+  {
+    number: '1',
+    label: 'Share what’s going on',
+    description:
+      'We’ll ask you about your situation — what happened, what’s weighing on you most, and what you’re hoping for. Nothing you don’t already know the answer to. Takes about 5 minutes.',
+  },
+  {
+    number: '2',
+    label: 'Receive your personal plan',
+    description:
+      'The moment you finish we build a plan specifically for you. Not a template. Not generic advice. A real plan based on what you told us.',
+  },
+  {
+    number: '3',
+    label: 'We walk beside you',
+    description:
+      'Use our tools at your own pace. Reach out anytime. We’re here until things get better — however long that takes.',
+  },
+]
+
+const REASSURANCES = [
+  'Free for everyone who needs it',
+  'No password to create — just click the link we send you',
+  'We will never share your email',
 ]
 
 export default function SignInPage() {
@@ -29,7 +50,7 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen bg-navy">
-      <div className="max-w-2xl mx-auto px-6 py-20 lg:py-28">
+      <div className="max-w-xl mx-auto px-6 py-20 lg:py-28">
         <Link href="/" className="font-display font-bold text-lg text-white">Hope After 50</Link>
 
         {sent ? (
@@ -53,44 +74,45 @@ export default function SignInPage() {
         ) : (
           <>
             <h1 className="font-display text-display-md text-white mt-10 mb-4">
-              You just did something hard.
+              You tell us what you&rsquo;re going through.
             </h1>
             <p className="font-body text-amber-hope text-lg">
-              Asking for help when everything feels uncertain takes courage. You&rsquo;re in the right place.
+              We create a plan. We help you implement it. And we support you until things get better.
             </p>
 
-            <ul className="space-y-5 mt-12">
-              {EXPECTATIONS.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <svg
-                    className="w-5 h-5 text-amber-hope flex-shrink-0 mt-0.5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  <span className="font-body text-white/80">{item}</span>
+            <p className="font-body text-white/80 mt-6">
+              That&rsquo;s it. No complicated process. No judgment. Just honest help from people who
+              understand what you&rsquo;re carrying right now.
+            </p>
+
+            <div className="h-px bg-white/10 mt-12 mb-12" />
+
+            <p className="font-body text-white/90 text-lg mb-8">
+              Here&rsquo;s how it works:
+            </p>
+
+            <ul className="space-y-8">
+              {STEPS.map((step) => (
+                <li key={step.number} className="flex items-start gap-4">
+                  <span className="font-display text-amber-hope text-xl flex-shrink-0">{step.number}</span>
+                  <div>
+                    <p className="font-body text-white font-bold mb-1">{step.label}</p>
+                    <p className="font-body text-white/70">{step.description}</p>
+                  </div>
                 </li>
               ))}
             </ul>
 
             <div className="h-px bg-white/10 mt-12 mb-12" />
 
-            <p className="font-body text-amber-hope text-sm font-semibold uppercase tracking-wide mb-3">
-              Your personalized plan
-            </p>
-            <h2 className="font-display text-display-sm text-white mb-3">
-              Here&rsquo;s what happens next.
-            </h2>
-            <p className="font-body text-white/80 mb-8">
-              In the next few minutes you&rsquo;ll receive a personalized Rebuild Plan — practical next steps built around your specific situation. Enter your email and we&rsquo;ll send you a secure link to get started. No password needed.
+            <p className="font-body text-white/80 text-center mb-6">
+              Ready to take the first step?
             </p>
 
             <form onSubmit={handleEmailSignIn} className="space-y-3">
               <div>
-                <label className="font-body text-sm text-white/80 mb-1 block">
-                  Where should we send your plan?
+                <label className="font-body text-sm text-white/70 mb-1 block">
+                  Your email address
                 </label>
                 <input
                   type="email"
@@ -106,28 +128,22 @@ export default function SignInPage() {
                 disabled={loading || !email}
                 className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? 'Sending...' : 'Send My Plan Link'}
+                {loading ? 'Sending...' : 'Send My Secure Link'}
               </button>
             </form>
 
-            <p className="font-body text-white/50 text-sm mt-4">
-              We&rsquo;ll never share your email or send you anything you didn&rsquo;t ask for.
-            </p>
-
-            <div className="flex items-center gap-4 my-8">
-              <div className="flex-1 h-px bg-white/10" />
-              <span className="font-body text-white/30 text-sm">or</span>
-              <div className="flex-1 h-px bg-white/10" />
+            <div className="space-y-1 mt-6 text-center">
+              {REASSURANCES.map((line) => (
+                <p key={line} className="font-body text-white/50 text-sm">
+                  ✓ {line}
+                </p>
+              ))}
             </div>
 
-            <p className="font-body text-center">
-              <Link href="/auth/signin?mode=existing" className="text-amber-hope text-sm hover:underline">
-                I already have an account — sign in
+            <p className="font-body text-center mt-10">
+              <Link href="/auth/signin?mode=existing" className="text-white/40 text-sm hover:underline">
+                Already have an account? Sign in here
               </Link>
-            </p>
-
-            <p className="font-body text-white/50 text-sm text-center mt-16">
-              Free for everyone who needs it. No pressure. No catch.
             </p>
           </>
         )}
