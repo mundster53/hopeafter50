@@ -24,12 +24,15 @@ export const authOptions: NextAuthOptions = {
       from: process.env.FROM_EMAIL ?? 'hello@hopeafter50.org',
       sendVerificationRequest: async ({ identifier: email, url }) => {
         const resend = new Resend(process.env.RESEND_API_KEY)
-        await resend.emails.send({
+        const { error } = await resend.emails.send({
           from: `HopeAfter50 <${process.env.FROM_EMAIL ?? 'hello@hopeafter50.org'}>`,
           to: email,
           subject: 'Your sign-in link for HopeAfter50',
           html: magicLinkEmail(url),
         })
+        if (error) {
+          throw new Error(`Resend failed to send magic link: ${error.message}`)
+        }
       },
     }),
   ],
