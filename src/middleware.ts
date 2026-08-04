@@ -1,13 +1,20 @@
 // ============================================================
 // HopeAfter50 — Route Protection Middleware
-// All /platform/* routes require authentication
+// All /platform/* and /admin/* routes require authentication
 // Unauthenticated users are redirected to sign-in
 // ============================================================
 
-export { default } from 'next-auth/middleware'
+import { withAuth } from 'next-auth/middleware'
+
+export default withAuth({
+  callbacks: {
+    authorized: ({ token }) => !!token,
+  },
+  pages: {
+    signIn: '/auth/signin',
+  },
+})
 
 export const config = {
-  matcher: [
-    '/platform/:path*',  // All member platform routes
-  ],
+  matcher: ['/platform/:path*', '/admin/:path*'],
 }
