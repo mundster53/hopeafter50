@@ -89,6 +89,7 @@ model Member {
   coverLetters          CoverLetter[]
   interviewPreps        InterviewPrep[]
   linkedInOptimizations LinkedInOptimization[]
+  partnerDonations      Partner[]
 }
 
 model Assessment {
@@ -243,4 +244,22 @@ model LinkedInOptimization {
   experience  String?  @db.Text
   analysis    Json     // AI response, based on prompts/resume-analysis.md guidance
   createdAt   DateTime @default(now())
+}
+
+// ============================================================
+// Partner donations — voluntary support from members
+// Created by the Stripe webhook once checkout.session.completed fires
+// ============================================================
+
+model Partner {
+  id               String   @id @default(cuid())
+  memberId         String?
+  member           Member?  @relation(fields: [memberId], references: [id])
+  email            String
+  amount           Int      // in cents
+  interval         String   // "monthly" | "one_time"
+  stripeCustomerId String?
+  stripeSessionId  String   @unique
+  status           String   @default("complete")
+  createdAt        DateTime @default(now())
 }
