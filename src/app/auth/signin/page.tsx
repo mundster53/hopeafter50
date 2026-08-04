@@ -8,6 +8,12 @@ import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import Link from 'next/link'
 
+const EXPECTATIONS = [
+  'Answer a few questions about where you are right now. About 5 minutes.',
+  'Receive your personalized plan immediately. Not generic advice — a real plan built around your situation.',
+  'Get practical next steps, AI-powered tools, and someone in your corner.',
+]
+
 export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
@@ -22,17 +28,45 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-warm-white flex flex-col">
-      {/* Header */}
-      <div className="bg-navy py-4 px-6">
-        <Link href="/" className="font-display text-white font-bold text-lg">HopeAfter50</Link>
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Left: reassurance panel */}
+      <div className="bg-navy text-white flex flex-col justify-between px-8 py-12 lg:w-1/2 lg:px-16 lg:py-16">
+        <div>
+          <Link href="/" className="font-display font-bold text-lg text-white">HopeAfter50</Link>
+
+          <h1 className="font-display text-display-md text-white mt-10 mb-4">
+            You just did something hard.
+          </h1>
+          <p className="font-body text-amber-light text-lg mb-10">
+            Asking for help when everything feels uncertain takes courage. You&rsquo;re in the right place.
+          </p>
+
+          <ul className="space-y-5">
+            {EXPECTATIONS.map((item) => (
+              <li key={item} className="flex items-start gap-3">
+                <svg
+                  className="w-5 h-5 text-amber-hope flex-shrink-0 mt-0.5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span className="font-body text-white/90">{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <p className="font-body text-white/60 text-sm mt-12 lg:mt-0">
+          Free for everyone who needs it. No pressure. No catch.
+        </p>
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-12">
+      {/* Right: sign-in form */}
+      <div className="bg-warm-white flex-1 flex items-center justify-center px-6 py-12 lg:px-16">
         <div className="w-full max-w-sm">
-
           {sent ? (
-            // Magic link sent state
             <div className="card text-center">
               <div className="w-12 h-12 rounded-full bg-amber-pale flex items-center justify-center mx-auto mb-4">
                 <svg className="w-6 h-6 text-amber-hope" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -52,43 +86,52 @@ export default function SignInPage() {
             </div>
           ) : (
             <div>
-              <div className="text-center mb-8">
-                <h1 className="font-display text-display-sm text-navy mb-2">Welcome back.</h1>
-                <p className="font-body text-slate-supporting">Sign in to continue your rebuild.</p>
+              <p className="font-body text-amber-hope text-sm font-semibold uppercase tracking-wide mb-3">
+                Let&rsquo;s get started
+              </p>
+              <h1 className="font-display text-display-sm text-navy mb-3">
+                Where should we send your plan?
+              </h1>
+              <p className="font-body text-slate-supporting mb-8">
+                Enter your email and we&rsquo;ll send you a secure sign-in link. No password needed.
+              </p>
+
+              <form onSubmit={handleEmailSignIn} className="space-y-3">
+                <div>
+                  <label className="font-body text-sm text-slate-supporting mb-1 block">
+                    Your email address
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    placeholder="you@example.com"
+                    required
+                    className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading || !email}
+                  className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Sending...' : 'Send My Plan Link'}
+                </button>
+              </form>
+
+              <p className="font-body text-slate-supporting text-sm mt-4">
+                We&rsquo;ll never share your email or send you anything you didn&rsquo;t ask for.
+              </p>
+
+              <div className="flex items-center gap-4 my-8">
+                <div className="flex-1 h-px bg-sage" />
+                <span className="font-body text-slate-light text-sm">or</span>
+                <div className="flex-1 h-px bg-sage" />
               </div>
 
-              <div className="card space-y-4">
-
-                {/* Magic Link Email */}
-                <form onSubmit={handleEmailSignIn} className="space-y-3">
-                  <div>
-                    <label className="font-body text-sm text-slate-supporting mb-1 block">
-                      Email address
-                    </label>
-                    <input
-                      type="email"
-                      value={email}
-                      onChange={e => setEmail(e.target.value)}
-                      placeholder="you@example.com"
-                      required
-                      className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope"
-                    />
-                  </div>
-                  <button
-                    type="submit"
-                    disabled={loading || !email}
-                    className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Sending link...' : 'Send sign-in link'}
-                  </button>
-                </form>
-
-              </div>
-
-              <p className="font-body text-slate-supporting text-sm text-center mt-6">
-                New here?{' '}
-                <Link href="/platform/assessment" className="text-amber-hope hover:underline">
-                  Start your Rebuild Assessment
+              <p className="font-body text-center">
+                <Link href="/auth/signin?mode=existing" className="text-amber-hope text-sm hover:underline">
+                  I already have an account — sign in
                 </Link>
               </p>
             </div>
