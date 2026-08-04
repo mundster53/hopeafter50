@@ -166,6 +166,13 @@ export default function PlanPage() {
           <p className="font-body text-slate-supporting">Yesterday, everything was in your head. Today, you have direction. That matters.</p>
         </div>
 
+        {/* Support Link */}
+        <div className="text-center">
+          <Link href="/platform/plan/support" className="font-body text-amber-hope text-sm hover:underline">
+            Want to help someone else find their next step? →
+          </Link>
+        </div>
+
         {/* Next Decision */}
         <div>
           <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-4">Your Next Decision</p>
