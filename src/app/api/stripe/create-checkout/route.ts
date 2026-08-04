@@ -4,14 +4,19 @@
 // either a monthly subscription or a one-time gift.
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
+import Stripe from 'stripe'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { stripe } from '@/lib/stripe'
 
 const SUCCESS_URL = 'https://www.hopeafter50.org/platform/dashboard?partner=true'
 const CANCEL_URL = 'https://www.hopeafter50.org/platform/plan/support'
 
 export async function POST(req: NextRequest) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 })
+  }
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+
   const session = await getServerSession(authOptions)
 
   try {
