@@ -75,7 +75,7 @@ export default async function DashboardPage() {
             action={data.nextAction.url ? { label: 'Continue', href: data.nextAction.url } : undefined}
           />
           <Anchor
-            label="My Financial Runway"
+            label="My Savings Timeline"
             value={data.financialRunway}
             action={{ label: 'Update', href: '/platform/tools/income-strategy?tab=runway' }}
           />
