@@ -2,19 +2,6 @@
 // HopeAfter50 — Resume Text Extraction
 // Supports PDF, DOCX, and plain text uploads.
 // ============================================================
-// pdf-parse's bundled pdfjs-dist references the browser-only `DOMMatrix`
-// global at module load time. It tries to source one from the optional
-// @napi-rs/canvas native binary, but Vercel's Node serverless runtime
-// doesn't ship a matching platform binary for it, so that require fails
-// and pdf-parse crashes with "DOMMatrix is not defined" before our code
-// ever runs — even for non-PDF uploads, since the import is unconditional.
-// Polyfilling the global before importing pdf-parse avoids the crash; we
-// only need text extraction, not real canvas transforms.
-if (typeof (globalThis as any).DOMMatrix === 'undefined') {
-  ;(globalThis as any).DOMMatrix = require('dommatrix')
-}
-
-import { PDFParse } from 'pdf-parse'
 import mammoth from 'mammoth'
 
 export async function extractResumeText(file: File): Promise<string> {
@@ -23,6 +10,25 @@ export async function extractResumeText(file: File): Promise<string> {
   const type = file.type
 
   if (type === 'application/pdf' || name.endsWith('.pdf')) {
+    // pdf-parse's bundled pdfjs-dist references the browser-only `DOMMatrix`
+    // global at module load time. It tries to source one from the optional
+    // @napi-rs/canvas native binary, but Vercel's Node serverless runtime
+    // doesn't ship a matching platform binary for it, so that require fails
+    // and pdf-parse crashes with "DOMMatrix is not defined" on load. A static
+    // top-level `import` gets hoisted above other statements when compiled
+    // to CJS, so the polyfill has to be set via a runtime require() — and
+    // pdf-parse itself required lazily here — to guarantee ordering. We only
+    // need text extraction, not real canvas transforms.
+    if (typeof (globalThis as any).DOMMatrix === 'undefined') {
+      // Webpack resolves this to dommatrix's ESM build, which comes back
+      // through webpack's CJS interop as { default: CSSMatrix, ... } rather
+      // than the constructor itself (unlike a plain Node require, which
+      // resolves the package's CJS build and returns the constructor
+      // directly) — unwrap .default so both cases work.
+      const dommatrixModule: any = require('dommatrix')
+      ;(globalThis as any).DOMMatrix = dommatrixModule.default ?? dommatrixModule
+    }
+    const { PDFParse } = require('pdf-parse')
     const parser = new PDFParse({ data: buffer })
     try {
       const result = await parser.getText()
