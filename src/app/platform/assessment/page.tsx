@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 // Question index
-const TOTAL_QUESTIONS = 15
+const TOTAL_QUESTIONS = 16
 
 export default function AssessmentPage() {
   const router = useRouter()
@@ -76,19 +76,20 @@ export default function AssessmentPage() {
         {step === 0 && <WelcomeStep onNext={() => setStep(1)} />}
         {step === 1 && <Q1 answers={answers} update={update} onNext={() => setStep(2)} />}
         {step === 2 && <Q2 answers={answers} update={update} onNext={() => setStep(3)} onBack={() => setStep(1)} />}
-        {step === 3 && <Q3 answers={answers} update={update} onNext={() => setStep(4)} onBack={() => setStep(2)} />}
+        {step === 3 && <Q3LastRole answers={answers} update={update} onNext={() => setStep(4)} onBack={() => setStep(2)} />}
         {step === 4 && <Q4 answers={answers} update={update} onNext={() => setStep(5)} onBack={() => setStep(3)} />}
         {step === 5 && <Q5 answers={answers} update={update} onNext={() => setStep(6)} onBack={() => setStep(4)} />}
-        {step === 6 && <Q6 answers={answers} toggle={(v: string) => toggleMulti('workInterests', v)} onNext={() => setStep(7)} onBack={() => setStep(5)} />}
-        {step === 7 && <Q7 answers={answers} update={update} onNext={() => setStep(8)} onBack={() => setStep(6)} />}
+        {step === 6 && <Q6 answers={answers} update={update} onNext={() => setStep(7)} onBack={() => setStep(5)} />}
+        {step === 7 && <Q7 answers={answers} toggle={(v: string) => toggleMulti('workInterests', v)} onNext={() => setStep(8)} onBack={() => setStep(6)} />}
         {step === 8 && <Q8 answers={answers} update={update} onNext={() => setStep(9)} onBack={() => setStep(7)} />}
         {step === 9 && <Q9 answers={answers} update={update} onNext={() => setStep(10)} onBack={() => setStep(8)} />}
         {step === 10 && <Q10 answers={answers} update={update} onNext={() => setStep(11)} onBack={() => setStep(9)} />}
-        {step === 11 && <Q11 answers={answers} toggle={(v: string) => toggleMulti('aiToolsNeeded', v)} onNext={() => setStep(12)} onBack={() => setStep(10)} />}
-        {step === 12 && <Q12 answers={answers} update={update} onNext={() => setStep(13)} onBack={() => setStep(11)} />}
+        {step === 11 && <Q11 answers={answers} update={update} onNext={() => setStep(12)} onBack={() => setStep(10)} />}
+        {step === 12 && <Q12 answers={answers} toggle={(v: string) => toggleMulti('aiToolsNeeded', v)} onNext={() => setStep(13)} onBack={() => setStep(11)} />}
         {step === 13 && <Q13 answers={answers} update={update} onNext={() => setStep(14)} onBack={() => setStep(12)} />}
         {step === 14 && <Q14 answers={answers} update={update} onNext={() => setStep(15)} onBack={() => setStep(13)} />}
-        {step === 15 && <Q15 answers={answers} update={update} onSubmit={handleSubmit} onBack={() => setStep(14)} submitting={submitting} />}
+        {step === 15 && <Q15 answers={answers} update={update} onNext={() => setStep(16)} onBack={() => setStep(14)} />}
+        {step === 16 && <Q16 answers={answers} update={update} onSubmit={handleSubmit} onBack={() => setStep(15)} submitting={submitting} />}
       </div>
     </div>
   )
@@ -284,9 +285,29 @@ function Q2({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q3 — How long rebuilding
+// Q3 — Last role
 // ----------------------------
-function Q3({ answers, update, onNext, onBack }: any) {
+function Q3LastRole({ answers, update, onNext, onBack }: any) {
+  return (
+    <div>
+      <QuestionLabel>What kind of work were you doing before this happened?</QuestionLabel>
+      <QuestionNote>Describe it in your own words — your title, the type of work, the industry. Whatever feels most accurate.</QuestionNote>
+      <textarea
+        value={answers.lastRole || ''}
+        onChange={e => update('lastRole', e.target.value)}
+        rows={4}
+        placeholder="Tell us about the work you were doing..."
+        className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope resize-none mb-4"
+      />
+      <NavButtons onBack={onBack} onNext={onNext} />
+    </div>
+  )
+}
+
+// ----------------------------
+// Q4 — How long rebuilding
+// ----------------------------
+function Q4({ answers, update, onNext, onBack }: any) {
   const options = [
     { label: 'Less than 30 days', value: 'under_30_days' },
     { label: '1–3 months', value: '1_3_months' },
@@ -308,9 +329,9 @@ function Q3({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q4 — Primary fear
+// Q5 — Primary fear
 // ----------------------------
-function Q4({ answers, update, onNext, onBack }: any) {
+function Q5({ answers, update, onNext, onBack }: any) {
   const options = [
     { label: 'Replacing my income', value: 'replacing_income' },
     { label: 'Paying the bills', value: 'paying_bills' },
@@ -334,9 +355,9 @@ function Q4({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q5 — Clarity level
+// Q6 — Clarity level
 // ----------------------------
-function Q5({ answers, update, onNext, onBack }: any) {
+function Q6({ answers, update, onNext, onBack }: any) {
   const options = [
     { label: 'I know what I want to do but need help getting there.', value: 'knows_what_wants' },
     { label: "I have several ideas but don't know which one to pursue.", value: 'has_ideas_unsure' },
@@ -356,17 +377,16 @@ function Q5({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q6 — Work interests (multi)
+// Q7 — Work interests (multi)
 // ----------------------------
-function Q6({ answers, toggle, onNext, onBack }: any) {
+function Q7({ answers, toggle, onNext, onBack }: any) {
   const options = [
-    { label: 'Another executive role', value: 'executive_role' },
-    { label: 'Fractional leadership', value: 'fractional_leadership' },
-    { label: 'Consulting', value: 'consulting' },
-    { label: 'Buying a business', value: 'buying_business' },
-    { label: 'Starting a business', value: 'starting_business' },
-    { label: 'Board positions', value: 'board_positions' },
-    { label: "I'm open to anything legitimate.", value: 'open_to_anything' },
+    { label: 'Find a job like the one I lost', value: 'same_type_of_work' },
+    { label: 'Find something better than what I had', value: 'better_opportunity' },
+    { label: 'Work for myself — consulting or advising', value: 'consulting' },
+    { label: 'Start or buy my own business', value: 'own_business' },
+    { label: 'Work part-time or in a flexible role', value: 'flexible_work' },
+    { label: "I'm not sure yet — just help me figure it out", value: 'open_to_anything' },
   ]
   const selected: string[] = answers.workInterests || []
   return (
@@ -384,9 +404,9 @@ function Q6({ answers, toggle, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q7 — Financial runway
+// Q8 — Financial runway
 // ----------------------------
-function Q7({ answers, update, onNext, onBack }: any) {
+function Q8({ answers, update, onNext, onBack }: any) {
   const options = [
     { label: 'Less than one month', value: 'under_1_month' },
     { label: '1–3 months', value: '1_3_months' },
@@ -409,9 +429,9 @@ function Q7({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q8 — Using savings
+// Q9 — Using savings
 // ----------------------------
-function Q8({ answers, update, onNext, onBack }: any) {
+function Q9({ answers, update, onNext, onBack }: any) {
   return (
     <div>
       <QuestionLabel>Have you already started using savings?</QuestionLabel>
@@ -425,9 +445,9 @@ function Q8({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q9 — Interview frequency
+// Q10 — Interview frequency
 // ----------------------------
-function Q9({ answers, update, onNext, onBack }: any) {
+function Q10({ answers, update, onNext, onBack }: any) {
   const options = [
     { label: 'Frequently', value: 'frequently' },
     { label: 'Occasionally', value: 'occasionally' },
@@ -449,9 +469,9 @@ function Q9({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q10 — Resume status
+// Q11 — Resume status
 // ----------------------------
-function Q10({ answers, update, onNext, onBack }: any) {
+function Q11({ answers, update, onNext, onBack }: any) {
   const options = [
     { label: 'Yes', value: 'yes' },
     { label: 'Mostly', value: 'mostly' },
@@ -471,9 +491,9 @@ function Q10({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q11 — AI tools (multi)
+// Q12 — AI tools (multi)
 // ----------------------------
-function Q11({ answers, toggle, onNext, onBack }: any) {
+function Q12({ answers, toggle, onNext, onBack }: any) {
   const options = ['Resume', 'LinkedIn', 'Cover Letter', 'Interview Prep', 'Networking']
   const selected: string[] = answers.aiToolsNeeded || []
   return (
@@ -491,9 +511,9 @@ function Q11({ answers, toggle, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q12 — Contact preference
+// Q13 — Contact preference
 // ----------------------------
-function Q12({ answers, update, onNext, onBack }: any) {
+function Q13({ answers, update, onNext, onBack }: any) {
   const options = [
     { label: "I'd rather work through the tools myself.", value: 'self_serve' },
     { label: 'Email me.', value: 'email' },
@@ -516,9 +536,9 @@ function Q12({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q13 — Faith-based
+// Q14 — Faith-based
 // ----------------------------
-function Q13({ answers, update, onNext, onBack }: any) {
+function Q14({ answers, update, onNext, onBack }: any) {
   return (
     <div>
       <QuestionLabel>Would you like faith-based encouragement included?</QuestionLabel>
@@ -532,9 +552,9 @@ function Q13({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q14 — Additional context
+// Q15 — Additional context
 // ----------------------------
-function Q14({ answers, update, onNext, onBack }: any) {
+function Q15({ answers, update, onNext, onBack }: any) {
   return (
     <div>
       <QuestionLabel>Is there anything else we should know?</QuestionLabel>
@@ -552,9 +572,9 @@ function Q14({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q15 — Success vision
+// Q16 — Success vision
 // ----------------------------
-function Q15({ answers, update, onSubmit, onBack, submitting }: any) {
+function Q16({ answers, update, onSubmit, onBack, submitting }: any) {
   return (
     <div>
       <QuestionLabel>One final question.</QuestionLabel>

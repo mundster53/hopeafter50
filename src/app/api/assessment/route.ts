@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
       ageRange: body.ageRange,
       gender: body.gender,
       situation: body.situation,
+      lastRole: body.lastRole,
       rebuildDuration: body.rebuildDuration,
       primaryFear: body.primaryFear,
       clarityLevel: body.clarityLevel,
@@ -62,6 +63,7 @@ export async function POST(req: NextRequest) {
         create: {
           memberId,
           situation: assessment.situation,
+          lastRole: assessment.lastRole,
           rebuildDuration: assessment.rebuildDuration,
           primaryFear: assessment.primaryFear,
           clarityLevel: assessment.clarityLevel,
@@ -76,6 +78,7 @@ export async function POST(req: NextRequest) {
         },
         update: {
           situation: assessment.situation,
+          lastRole: assessment.lastRole,
           rebuildDuration: assessment.rebuildDuration,
           primaryFear: assessment.primaryFear,
           clarityLevel: assessment.clarityLevel,

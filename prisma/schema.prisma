@@ -99,6 +99,7 @@ model Assessment {
   completedAt         DateTime @default(now())
 
   situation           String
+  lastRole            String?
   rebuildDuration     String
   primaryFear         String
   clarityLevel        String

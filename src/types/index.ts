@@ -94,6 +94,9 @@ export interface Assessment {
   situation: SituationType
 
   // Q3
+  lastRole?: string
+
+  // Q4
   rebuildDuration: RebuildDuration
 
   // Q4 - most important for prioritization
