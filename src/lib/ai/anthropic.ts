@@ -34,13 +34,17 @@ export async function runStructuredPrompt<T>({
   promptFile,
   input,
   maxTokens = 4096,
+  extraSystemInstruction,
 }: {
   promptFile: string
   input: unknown
   maxTokens?: number
+  extraSystemInstruction?: string
 }): Promise<T> {
   const systemPrompt = loadPrompt('system.md')
-  const taskPrompt = loadPrompt(promptFile)
+  const taskPrompt = extraSystemInstruction
+    ? `${loadPrompt(promptFile)}\n\n---\n\n${extraSystemInstruction}`
+    : loadPrompt(promptFile)
   const userContent = typeof input === 'string' ? input : JSON.stringify(input, null, 2)
 
   // Models occasionally ignore the "return JSON" instruction and respond with

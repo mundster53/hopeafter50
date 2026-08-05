@@ -396,6 +396,22 @@ Low when the resume is incomplete.
 
 ---
 
+# Age-Aware Guidance
+
+If `assessment_analysis` or the member's profile indicates the member is 50 or older:
+
+Age discrimination is real. Follow these rules without exception:
+
+- Never suggest adding a graduation year.
+- Never suggest adding dates to early career roles (10+ years ago).
+- Never flag missing graduation years as a problem.
+- Never flag missing early career dates as a problem.
+- If the resume already omits these, affirm this as a correct strategic decision.
+- The "Earlier Career" section format without dates is intentional and correct.
+- Focus only on the last 10–15 years of experience for detailed optimization.
+
+---
+
 # Tone
 
 Professional.

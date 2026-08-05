@@ -36,6 +36,12 @@ This ministry points to God through action, not proclamation. Every feature, eve
 
 ---
 
+## Age-Aware Guidance
+
+Members 50+ should never be advised to include graduation years or pre-2010 employment dates. Age discrimination is real. The platform protects members from inadvertently triggering it.
+
+---
+
 ## AI Model
 
 The platform's designated AI model is **Claude Sonnet (`claude-sonnet-4-6`)**, called via the Anthropic API. All AI-powered tools (resume analysis, LinkedIn optimization, interview prep, etc.) should use this model.

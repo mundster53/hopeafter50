@@ -18,6 +18,21 @@ import { ResumeAnalysisResult, ResumeOptimizationResult } from '@/types/ai'
 
 export const runtime = 'nodejs'
 
+const AGE_50_PLUS_INSTRUCTION = `IMPORTANT — This member is 50+. Age discrimination is real. Follow these rules without exception:
+- NEVER suggest adding a graduation year
+- NEVER suggest adding dates to early career roles (10+ years ago)
+- NEVER flag missing graduation years as a problem
+- NEVER flag missing early career dates as a problem
+- If the resume already omits these, affirm this as a correct strategic decision
+- The 'Earlier Career' section format without dates is intentional and correct
+- Focus only on the last 10-15 years of experience for detailed optimization`
+
+const AGE_DATING_SUGGESTION_PATTERN = /graduation year|early career.{0,20}date|date.{0,20}early career/i
+
+function isAgeDatingSuggestion(suggestion: string): boolean {
+  return AGE_DATING_SUGGESTION_PATTERN.test(suggestion)
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
@@ -44,7 +59,7 @@ export async function POST(req: NextRequest) {
     }
 
     const resumeFileUrl = await uploadMemberFile(file, 'resumes', memberId)
-    const { member, assessment_analysis } = await getMemberAiContext(memberId)
+    const { member, assessment_analysis, isAge50Plus } = await getMemberAiContext(memberId)
 
     // Step 1: Resume Analysis (prompts/resume-analysis.md)
     const analysis = await runStructuredPrompt<ResumeAnalysisResult>({
@@ -58,6 +73,7 @@ export async function POST(req: NextRequest) {
         assessment_analysis,
       },
       maxTokens: 4096,
+      extraSystemInstruction: isAge50Plus ? AGE_50_PLUS_INSTRUCTION : undefined,
     })
 
     const savedAnalysis = await prisma.resumeAnalysis.create({
@@ -85,7 +101,14 @@ export async function POST(req: NextRequest) {
         career_preferences: {},
       },
       maxTokens: 8192,
+      extraSystemInstruction: isAge50Plus ? AGE_50_PLUS_INSTRUCTION : undefined,
     })
+
+    if (isAge50Plus) {
+      optimization.recommended_follow_up = optimization.recommended_follow_up.filter(
+        (suggestion) => !isAgeDatingSuggestion(suggestion)
+      )
+    }
 
     const savedOptimization = await prisma.resumeOptimization.create({
       data: {
