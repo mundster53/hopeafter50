@@ -7,6 +7,10 @@ const nextConfig = {
     outputFileTracingIncludes: {
       '/api/**/*': ['./prompts/**/*'],
     },
+    // pdf-parse bundles pdfjs-dist's ESM build, which webpack mis-bundles for
+    // the server runtime (throws "Object.defineProperty called on non-object"
+    // at module-load time). Keep it external so Node requires it natively.
+    serverComponentsExternalPackages: ['pdf-parse'],
   },
 }
 

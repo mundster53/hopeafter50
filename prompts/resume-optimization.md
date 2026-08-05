@@ -362,7 +362,11 @@ Do not fabricate the missing information.
 
 # Output Format
 
-Return valid JSON.
+Your entire response must be ONLY the JSON object below — a single valid JSON
+object and nothing else. Do not output the resume as standalone markdown, and
+do not include any headers, prose, or commentary before or after the JSON.
+The optimized resume itself belongs inside `optimized_resume_markdown` as a
+JSON string (with `\n` line breaks), not as raw markdown in your response.
 
 ```json
 {

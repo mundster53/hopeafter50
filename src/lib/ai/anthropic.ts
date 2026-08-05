@@ -41,27 +41,38 @@ export async function runStructuredPrompt<T>({
 }): Promise<T> {
   const systemPrompt = loadPrompt('system.md')
   const taskPrompt = loadPrompt(promptFile)
+  const userContent = typeof input === 'string' ? input : JSON.stringify(input, null, 2)
 
-  const response = await getClient().messages.create({
-    model: MODEL,
-    max_tokens: maxTokens,
-    system: `${systemPrompt}\n\n---\n\n${taskPrompt}`,
-    messages: [
-      {
-        role: 'user',
-        content: typeof input === 'string' ? input : JSON.stringify(input, null, 2),
-      },
-    ],
-  })
+  // Models occasionally ignore the "return JSON" instruction and respond with
+  // raw markdown/prose instead, especially on prompts whose payload includes
+  // a large markdown field. Retry once with a stricter reminder rather than
+  // failing the whole request on that non-determinism.
+  for (let attempt = 0; attempt < 2; attempt++) {
+    const response = await getClient().messages.create({
+      model: MODEL,
+      max_tokens: maxTokens,
+      system:
+        attempt === 0
+          ? `${systemPrompt}\n\n---\n\n${taskPrompt}`
+          : `${systemPrompt}\n\n---\n\n${taskPrompt}\n\n---\n\nIMPORTANT: Your previous response was not valid JSON. Respond with ONLY a single valid JSON object matching the required structure — no markdown, headers, or commentary outside it.`,
+      messages: [{ role: 'user', content: userContent }],
+    })
 
-  const textBlock = response.content.find(
-    (block): block is Anthropic.TextBlock => block.type === 'text'
-  )
-  if (!textBlock) {
-    throw new Error('No text content returned from Anthropic')
+    const textBlock = response.content.find(
+      (block): block is Anthropic.TextBlock => block.type === 'text'
+    )
+    if (!textBlock) {
+      throw new Error('No text content returned from Anthropic')
+    }
+
+    try {
+      return parseJsonResponse<T>(textBlock.text)
+    } catch (err) {
+      if (attempt === 1) throw err
+    }
   }
 
-  return parseJsonResponse<T>(textBlock.text)
+  throw new Error('Unreachable')
 }
 
 /**
