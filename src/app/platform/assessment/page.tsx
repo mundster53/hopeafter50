@@ -434,7 +434,7 @@ function Q8({ answers, update, onNext, onBack }: any) {
 function Q9({ answers, update, onNext, onBack }: any) {
   return (
     <div>
-      <QuestionLabel>Have you already started using savings?</QuestionLabel>
+      <QuestionLabel>Have you started using your savings to pay your bills?</QuestionLabel>
       <div className="space-y-2 mb-4">
         <Radio label="Yes" value="yes" checked={answers.usingSavings === 'yes'} onChange={() => update('usingSavings', 'yes')} />
         <Radio label="No" value="no" checked={answers.usingSavings === 'no'} onChange={() => update('usingSavings', 'no')} />
