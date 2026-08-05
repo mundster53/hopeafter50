@@ -503,7 +503,7 @@ function Q12({ answers, update, onNext, onBack }: any) {
   return (
     <div>
       <QuestionLabel>How would you like to work with us?</QuestionLabel>
-      <QuestionNote>No pressure. You choose.</QuestionNote>
+      <QuestionNote>No pressure. You choose — and you can change this anytime from your dashboard.</QuestionNote>
       <div className="space-y-2 mb-4">
         {options.map(o => (
           <Radio key={o.value} label={o.label} value={o.value} checked={answers.contactPreference === o.value} onChange={() => update('contactPreference', o.value)} />
