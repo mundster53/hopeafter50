@@ -2,6 +2,18 @@
 // HopeAfter50 — Resume Text Extraction
 // Supports PDF, DOCX, and plain text uploads.
 // ============================================================
+// pdf-parse's bundled pdfjs-dist references the browser-only `DOMMatrix`
+// global at module load time. It tries to source one from the optional
+// @napi-rs/canvas native binary, but Vercel's Node serverless runtime
+// doesn't ship a matching platform binary for it, so that require fails
+// and pdf-parse crashes with "DOMMatrix is not defined" before our code
+// ever runs — even for non-PDF uploads, since the import is unconditional.
+// Polyfilling the global before importing pdf-parse avoids the crash; we
+// only need text extraction, not real canvas transforms.
+if (typeof (globalThis as any).DOMMatrix === 'undefined') {
+  ;(globalThis as any).DOMMatrix = require('dommatrix')
+}
+
 import { PDFParse } from 'pdf-parse'
 import mammoth from 'mammoth'
 
