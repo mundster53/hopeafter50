@@ -73,12 +73,12 @@ export default function ResumeToolPage() {
       </div>
 
       <div className="max-content mx-auto px-6 py-12">
-        <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4">AI Resume Intelligence System</p>
+        <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4">Your Resume</p>
         <h1 className="font-display text-display-md text-navy mb-4">
-          Your experience deserves to be understood.
+          Let's make your resume impossible to ignore.
         </h1>
         <p className="font-body text-slate-supporting mb-8 text-lg">
-          Upload your resume and we'll analyze it, identify improvements, and generate an optimized version — all while preserving your authentic voice.
+          Upload your resume and we'll show you exactly what's working, what's not, and how to fix it — in plain language, in your own words.
         </p>
 
         {!result && (
