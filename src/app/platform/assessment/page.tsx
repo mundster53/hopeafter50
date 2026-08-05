@@ -542,7 +542,7 @@ function Q14({ answers, update, onNext, onBack }: any) {
         value={answers.additionalContext || ''}
         onChange={e => update('additionalContext', e.target.value)}
         rows={5}
-        placeholder="Anything you'd like us to know about your situation..."
+        placeholder="For example: I'm caring for an aging parent while job searching. Or: I've applied to over 100 jobs and can't figure out what's wrong. Or: I just need someone to tell me it's going to be ok."
         className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope resize-none mb-4"
       />
       <NavButtons onBack={onBack} onNext={onNext} nextLabel="Almost Done →" />
