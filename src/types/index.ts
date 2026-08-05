@@ -260,7 +260,7 @@ export interface Milestone {
 }
 
 export const ALL_MILESTONES: Omit<Milestone, 'completedAt'>[] = [
-  { id: 'assessment_complete', label: 'Assessment Completed' },
+  { id: 'assessment_complete', label: 'Your story shared' },
   { id: 'resume_uploaded', label: 'Resume Uploaded' },
   { id: 'resume_optimized', label: 'Resume Optimized' },
   { id: 'linkedin_updated', label: 'LinkedIn Updated' },

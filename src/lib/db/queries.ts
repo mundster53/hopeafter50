@@ -53,9 +53,9 @@ export function buildDashboardViewModel(
     faithBased: member.faithBasedEncouragement,
     currentStage: (plan?.currentStage ?? 'stabilize') as RebuildPlanType['currentStage'],
     progressPercent: plan?.progressPercent ?? 0,
-    currentFocus: topPriorities[0]?.label ?? 'Complete Your Assessment',
+    currentFocus: topPriorities[0]?.label ?? 'Tell Us Your Story',
     nextAction: todaysAction ?? {
-      title: 'Complete Your Assessment',
+      title: 'Tell Us Your Story',
       description: 'Tell us about your situation so we can build your Rebuild Plan.',
       estimatedMinutes: 10,
       url: '/platform/assessment',

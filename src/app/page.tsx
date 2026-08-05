@@ -156,7 +156,7 @@ function WhatWeDo() {
 function WhatHappensNext() {
   const steps = [
     {
-      title: 'Complete the Rebuild Assessment.',
+      title: 'Tell us your story.',
       detail: 'Approximately 10 minutes.',
       sub: null,
     },

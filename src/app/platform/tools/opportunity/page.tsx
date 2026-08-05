@@ -68,7 +68,7 @@ export default function OpportunityEvaluatorPage() {
         <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4">Opportunity Evaluator</p>
         <h1 className="font-display text-display-md text-navy mb-4">Is this opportunity worth pursuing?</h1>
         <p className="font-body text-slate-supporting mb-8 text-lg">
-          Paste a job posting and we'll give you a balanced, evidence-based assessment against your experience — not just encouragement to apply.
+          Paste a job posting and we'll give you a balanced, evidence-based evaluation against your experience — not just encouragement to apply.
         </p>
 
         {!result && (

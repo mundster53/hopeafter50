@@ -165,10 +165,10 @@ function WelcomeStep({ onNext }: { onNext: () => void }) {
   return (
     <div className="bg-navy rounded-card px-6 py-12 md:px-12">
       <h1 className="font-display text-display-md text-white mb-4">
-        Help us understand what you're feeling.
+        Tell us your story.
       </h1>
       <p className="font-display text-xl text-amber-hope mb-6">
-        Where you are emotionally, what you're going through, and what you need right now.
+        Where you are, what you're carrying, and what you need right now.
       </p>
       <p className="font-body text-white/80 mb-8">
         There are no wrong answers here. Everything you share helps us build something that actually
