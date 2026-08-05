@@ -198,8 +198,8 @@ function buildTodayAction(
 
   if (assessment.hasCurrentResume === 'mostly' || stage === 'stabilize' || stage === 'position') {
     return {
-      title: 'Optimize Your Resume',
-      description: 'Run your resume through the AI Resume Intelligence System to identify quick improvements.',
+      title: 'Fix & Improve My Resume',
+      description: 'Upload your resume and we\'ll analyze it, improve it, and help you present your experience in the best possible way.',
       estimatedMinutes: 30,
       toolId: 'resume_optimizer',
       url: '/platform/tools/resume',
