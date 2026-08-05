@@ -72,7 +72,7 @@ export default async function DashboardPage() {
             </Link>
           </div>
         )}
-        <p className="font-body text-white/50 text-sm mb-8">Complete this step first. Everything else can wait.</p>
+        <p className="font-body text-white font-semibold text-lg mt-4 mb-8">Complete this step first. Everything else can wait.</p>
 
         {/* Four Anchors — always at top */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
