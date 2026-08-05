@@ -44,11 +44,12 @@ export default async function DashboardPage() {
         {/* Greeting */}
         <div className="mb-8">
           <h1 className="font-display text-display-sm text-white">{data.firstName ? `Welcome back, ${data.firstName}` : 'Welcome'}</h1>
-          <p className="font-body text-white/70 mt-1">We're glad you're here. Let's take the next step together.</p>
+          <p className="font-body text-white/70 mt-1">Here's your one step for today.</p>
         </div>
 
-        {!data.hasAssessment && (
-          <div className="bg-amber-hope text-white rounded-card p-8 md:p-12 mb-8">
+        {/* The one thing — always the first, unmissable thing on the page */}
+        {!data.hasAssessment ? (
+          <div className="bg-amber-hope text-white rounded-card p-8 md:p-12 mb-4">
             <h2 className="font-display text-display-md mb-4">Help us understand what you're feeling.</h2>
             <p className="font-body text-white/90 text-lg mb-8 max-w-2xl">
               Tell us where you are emotionally, what you're going through, and what you need right now.
@@ -59,7 +60,19 @@ export default async function DashboardPage() {
             </Link>
             <p className="font-body text-white/70 text-sm mt-4">Takes about 5 minutes. No wrong answers.</p>
           </div>
+        ) : (
+          <div className="bg-amber-hope text-white rounded-card p-8 md:p-12 mb-4">
+            <p className="font-body text-white/90 text-xs tracking-widest uppercase mb-3">Today's Action</p>
+            <h2 className="font-display text-display-md mb-4">{data.nextAction.title}</h2>
+            <p className="font-body text-white/90 text-lg mb-8 max-w-2xl">
+              Est. {data.nextAction.estimatedMinutes} min. This is the one thing to focus on right now.
+            </p>
+            <Link href={data.nextAction.url ?? '#'} className="inline-block bg-white text-navy font-body font-semibold px-8 py-4 rounded-card text-lg hover:bg-white/90 transition-colors">
+              Continue →
+            </Link>
+          </div>
         )}
+        <p className="font-body text-white/50 text-sm mb-8">Complete this step first. Everything else can wait.</p>
 
         {/* Four Anchors — always at top */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
@@ -97,8 +110,8 @@ export default async function DashboardPage() {
             {/* Today's Actions */}
             {data.todayActions.length > 0 && (
               <div className="bg-white/5 rounded-card p-6">
-                <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-4">Today's Actions</p>
-                <p className="font-body text-white/70 text-sm mb-4">Complete these in any order.</p>
+                <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-1">When You're Ready for More</p>
+                <p className="font-body text-white/70 text-sm mb-4">These are here whenever you want them. No pressure.</p>
                 <div className="space-y-3">
                   {data.todayActions.map(({ toolId, done }) => {
                     const tool = TOOLS[toolId as ToolId]
@@ -121,7 +134,8 @@ export default async function DashboardPage() {
 
             {/* My Toolbox */}
             <div className="bg-white/5 rounded-card p-6">
-              <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-4">My Toolbox</p>
+              <p className="font-body text-white/70 text-xs tracking-widest uppercase mb-1">Your Tools</p>
+              <p className="font-body text-white/70 text-sm mb-4">Use these at your own pace, in any order.</p>
               <div className="grid sm:grid-cols-2 gap-3">
                 {data.recommendedToolIds.map((id) => {
                   const tool = TOOLS[id as ToolId]
