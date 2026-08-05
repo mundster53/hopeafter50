@@ -558,17 +558,17 @@ function Q15({ answers, update, onSubmit, onBack, submitting }: any) {
     <div>
       <QuestionLabel>One final question.</QuestionLabel>
       <p className="font-display text-lg text-navy italic mb-2">
-        What would make you look back one year from now and say, "I'm so glad I found HopeAfter50"?
+        What would feel like a win right now?
       </p>
-      <QuestionNote>This tells us what success looks like to you — not to us.</QuestionNote>
+      <QuestionNote>It doesn't have to be big. Sometimes a win is just feeling like things are moving in the right direction.</QuestionNote>
       <textarea
         value={answers.successVision || ''}
         onChange={e => update('successVision', e.target.value)}
         rows={5}
-        placeholder="Describe what a successful rebuild looks like for you..."
+        placeholder="For example: I just want to find a job that replaces what I lost. Or: I want to stop waking up at 3am afraid. Or: I want to feel like myself again."
         className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope resize-none mb-4"
       />
-      <NavButtons onBack={onBack} onNext={onSubmit} nextLabel="Build My Rebuild Plan" submitting={submitting} />
+      <NavButtons onBack={onBack} onNext={onSubmit} nextLabel="Build My Plan" submitting={submitting} />
     </div>
   )
 }
