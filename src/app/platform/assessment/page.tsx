@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 // Question index
-const TOTAL_QUESTIONS = 16
+const TOTAL_QUESTIONS = 15
 
 export default function AssessmentPage() {
   const router = useRouter()
@@ -85,11 +85,10 @@ export default function AssessmentPage() {
         {step === 9 && <Q9 answers={answers} update={update} onNext={() => setStep(10)} onBack={() => setStep(8)} />}
         {step === 10 && <Q10 answers={answers} update={update} onNext={() => setStep(11)} onBack={() => setStep(9)} />}
         {step === 11 && <Q11 answers={answers} update={update} onNext={() => setStep(12)} onBack={() => setStep(10)} />}
-        {step === 12 && <Q12 answers={answers} toggle={(v: string) => toggleMulti('aiToolsNeeded', v)} onNext={() => setStep(13)} onBack={() => setStep(11)} />}
+        {step === 12 && <Q12 answers={answers} update={update} onNext={() => setStep(13)} onBack={() => setStep(11)} />}
         {step === 13 && <Q13 answers={answers} update={update} onNext={() => setStep(14)} onBack={() => setStep(12)} />}
         {step === 14 && <Q14 answers={answers} update={update} onNext={() => setStep(15)} onBack={() => setStep(13)} />}
-        {step === 15 && <Q15 answers={answers} update={update} onNext={() => setStep(16)} onBack={() => setStep(14)} />}
-        {step === 16 && <Q16 answers={answers} update={update} onSubmit={handleSubmit} onBack={() => setStep(15)} submitting={submitting} />}
+        {step === 15 && <Q15 answers={answers} update={update} onSubmit={handleSubmit} onBack={() => setStep(14)} submitting={submitting} />}
       </div>
     </div>
   )
@@ -491,29 +490,9 @@ function Q11({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q12 — AI tools (multi)
+// Q12 — Contact preference
 // ----------------------------
-function Q12({ answers, toggle, onNext, onBack }: any) {
-  const options = ['Resume', 'LinkedIn', 'Cover Letter', 'Interview Prep', 'Networking']
-  const selected: string[] = answers.aiToolsNeeded || []
-  return (
-    <div>
-      <QuestionLabel>Which AI tools would help most?</QuestionLabel>
-      <QuestionNote>Select all that apply.</QuestionNote>
-      <div className="space-y-2 mb-4">
-        {options.map(o => (
-          <Checkbox key={o} label={o} value={o} checked={selected.includes(o)} onChange={() => toggle(o)} />
-        ))}
-      </div>
-      <NavButtons onBack={onBack} onNext={onNext} disabled={selected.length === 0} />
-    </div>
-  )
-}
-
-// ----------------------------
-// Q13 — Contact preference
-// ----------------------------
-function Q13({ answers, update, onNext, onBack }: any) {
+function Q12({ answers, update, onNext, onBack }: any) {
   const options = [
     { label: "I'd rather work through the tools myself.", value: 'self_serve' },
     { label: 'Email me.', value: 'email' },
@@ -536,9 +515,9 @@ function Q13({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q14 — Faith-based
+// Q13 — Faith-based
 // ----------------------------
-function Q14({ answers, update, onNext, onBack }: any) {
+function Q13({ answers, update, onNext, onBack }: any) {
   return (
     <div>
       <QuestionLabel>Would you like faith-based encouragement included?</QuestionLabel>
@@ -552,9 +531,9 @@ function Q14({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q15 — Additional context
+// Q14 — Additional context
 // ----------------------------
-function Q15({ answers, update, onNext, onBack }: any) {
+function Q14({ answers, update, onNext, onBack }: any) {
   return (
     <div>
       <QuestionLabel>Is there anything else we should know?</QuestionLabel>
@@ -572,9 +551,9 @@ function Q15({ answers, update, onNext, onBack }: any) {
 }
 
 // ----------------------------
-// Q16 — Success vision
+// Q15 — Success vision
 // ----------------------------
-function Q16({ answers, update, onSubmit, onBack, submitting }: any) {
+function Q15({ answers, update, onSubmit, onBack, submitting }: any) {
   return (
     <div>
       <QuestionLabel>One final question.</QuestionLabel>

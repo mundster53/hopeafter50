@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
       usingSavings: body.usingSavings === 'yes',
       interviewFrequency: body.interviewFrequency,
       hasCurrentResume: body.hasCurrentResume,
-      aiToolsNeeded: body.aiToolsNeeded || [],
+      aiToolsNeeded: [],
       contactPreference: body.contactPreference,
       faithBasedEncouragement: body.faithBased === 'yes',
       additionalContext: body.additionalContext,
