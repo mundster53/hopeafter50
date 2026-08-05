@@ -416,8 +416,8 @@ function Q8({ answers, update, onNext, onBack }: any) {
   ]
   return (
     <div>
-      <QuestionLabel>How much financial runway do you have?</QuestionLabel>
-      <QuestionNote>This determines how urgently we prioritize income replacement.</QuestionNote>
+      <QuestionLabel>How much time do you have before you run out of money to pay your bills?</QuestionLabel>
+      <QuestionNote>Be as honest as you can. This helps us focus on what matters most right now.</QuestionNote>
       <div className="space-y-2 mb-4">
         {options.map(o => (
           <Radio key={o.value} label={o.label} value={o.value} checked={answers.financialRunway === o.value} onChange={() => update('financialRunway', o.value)} />
