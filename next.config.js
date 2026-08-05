@@ -5,7 +5,13 @@ const nextConfig = {
   // function output on Vercel.
   experimental: {
     outputFileTracingIncludes: {
-      '/api/**/*': ['./prompts/**/*'],
+      // /prompts/*.md is loaded via fs at runtime by src/lib/ai/prompts.ts.
+      // node_modules/pdf-parse/**/* covers pdfjs-dist's pdf.worker.mjs, which
+      // it loads dynamically at runtime (not a static import Next's file
+      // tracer can see) — without this the worker file is missing from the
+      // deployed function and pdf-parse throws "Setting up fake worker
+      // failed: Cannot find module '.../pdf.worker.mjs'" on every PDF upload.
+      '/api/**/*': ['./prompts/**/*', './node_modules/pdf-parse/**/*'],
     },
     // pdf-parse bundles pdfjs-dist's ESM build, which webpack mis-bundles for
     // the server runtime (throws "Object.defineProperty called on non-object"
