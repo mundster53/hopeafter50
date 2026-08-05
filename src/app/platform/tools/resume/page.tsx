@@ -35,6 +35,8 @@ export default function ResumeToolPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<ApiResult | null>(null)
+  const [downloading, setDownloading] = useState(false)
+  const [downloadError, setDownloadError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -62,6 +64,41 @@ export default function ResumeToolPage() {
       setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleDownload() {
+    if (!result) return
+    setDownloading(true)
+    setDownloadError(null)
+
+    try {
+      const res = await fetch('/api/resume/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeMarkdown: result.optimization.optimized_resume_markdown }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        setDownloadError(data?.error ?? 'Something went wrong creating your Word document. Please try again.')
+        return
+      }
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'Resume.docx'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error(err)
+      setDownloadError('Something went wrong creating your Word document. Please try again.')
+    } finally {
+      setDownloading(false)
     }
   }
 
@@ -207,6 +244,20 @@ export default function ResumeToolPage() {
               </div>
               <div className="bg-warm-white rounded-card p-6 border border-sage">
                 <MarkdownView content={result.optimization.optimized_resume_markdown} />
+              </div>
+              <div className="mt-6 text-center">
+                <button
+                  onClick={handleDownload}
+                  disabled={downloading}
+                  className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {downloading ? 'Preparing your document…' : 'Download My Resume'}
+                </button>
+                {downloadError && (
+                  <p className="font-body text-sm text-red-700 bg-red-50 rounded-card px-4 py-3 mt-3 inline-block">
+                    {downloadError}
+                  </p>
+                )}
               </div>
             </div>
 
