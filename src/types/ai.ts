@@ -42,6 +42,22 @@ export interface ResumeOptimizationResult {
 }
 
 // ----------------------------
+// prompts/resume-tailoring.md
+// ----------------------------
+export interface ResumeTailoringResult {
+  tailored_resume_markdown: string
+  match_score: number
+  match_label: string
+  top_strengths: string[]
+  honest_gaps: {
+    gap: string
+    guidance: string
+  }[]
+  keywords_incorporated: string[]
+  confidence: string
+}
+
+// ----------------------------
 // prompts/opportunity-evaluation.md
 // ----------------------------
 export interface OpportunityEvaluationResult {

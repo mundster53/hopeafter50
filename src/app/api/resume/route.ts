@@ -12,20 +12,12 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db/client'
 import { runStructuredPrompt } from '@/lib/ai/anthropic'
 import { getMemberAiContext } from '@/lib/ai/context'
+import { AGE_50_PLUS_INSTRUCTION } from '@/lib/ai/agePolicy'
 import { extractResumeText } from '@/lib/resume/extractText'
 import { uploadMemberFile } from '@/lib/storage/blob'
 import { ResumeAnalysisResult, ResumeOptimizationResult } from '@/types/ai'
 
 export const runtime = 'nodejs'
-
-const AGE_50_PLUS_INSTRUCTION = `IMPORTANT — This member is 50+. Age discrimination is real. Follow these rules without exception:
-- NEVER suggest adding a graduation year
-- NEVER suggest adding dates to early career roles (10+ years ago)
-- NEVER flag missing graduation years as a problem
-- NEVER flag missing early career dates as a problem
-- If the resume already omits these, affirm this as a correct strategic decision
-- The 'Earlier Career' section format without dates is intentional and correct
-- Focus only on the last 10-15 years of experience for detailed optimization`
 
 const AGE_DATING_SUGGESTION_PATTERN = /graduation year|early career.{0,20}date|date.{0,20}early career/i
 

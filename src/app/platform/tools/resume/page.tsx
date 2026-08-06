@@ -9,7 +9,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import MarkdownView from '@/components/platform/MarkdownView'
 import RatingBadge from '@/components/platform/RatingBadge'
-import { ResumeAnalysisResult, ResumeOptimizationResult } from '@/types/ai'
+import { ResumeAnalysisResult, ResumeOptimizationResult, ResumeTailoringResult } from '@/types/ai'
 
 type ApiResult = {
   analysis: ResumeAnalysisResult
@@ -37,6 +37,13 @@ export default function ResumeToolPage() {
   const [result, setResult] = useState<ApiResult | null>(null)
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
+
+  const [jobDescription, setJobDescription] = useState('')
+  const [tailoring, setTailoring] = useState(false)
+  const [tailorError, setTailorError] = useState<string | null>(null)
+  const [tailoringResult, setTailoringResult] = useState<ResumeTailoringResult | null>(null)
+  const [tailoredDownloading, setTailoredDownloading] = useState(false)
+  const [tailoredDownloadError, setTailoredDownloadError] = useState<string | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -99,6 +106,72 @@ export default function ResumeToolPage() {
       setDownloadError('Something went wrong creating your Word document. Please try again.')
     } finally {
       setDownloading(false)
+    }
+  }
+
+  async function handleTailor(e: React.FormEvent) {
+    e.preventDefault()
+    if (!result || !jobDescription.trim()) return
+    setTailoring(true)
+    setTailorError(null)
+
+    try {
+      const res = await fetch('/api/resume/tailor', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          optimizedResumeMarkdown: result.optimization.optimized_resume_markdown,
+          jobDescription,
+        }),
+      })
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        setTailorError(data.error ?? 'Something went wrong. Please try again.')
+        return
+      }
+
+      setTailoringResult(data.tailoring)
+    } catch (err) {
+      console.error(err)
+      setTailorError('Something went wrong. Please try again.')
+    } finally {
+      setTailoring(false)
+    }
+  }
+
+  async function handleDownloadTailored() {
+    if (!tailoringResult) return
+    setTailoredDownloading(true)
+    setTailoredDownloadError(null)
+
+    try {
+      const res = await fetch('/api/resume/download', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ resumeMarkdown: tailoringResult.tailored_resume_markdown }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        setTailoredDownloadError(data?.error ?? 'Something went wrong creating your Word document. Please try again.')
+        return
+      }
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'Tailored-Resume.docx'
+      document.body.appendChild(a)
+      a.click()
+      a.remove()
+      window.URL.revokeObjectURL(url)
+    } catch (err) {
+      console.error(err)
+      setTailoredDownloadError('Something went wrong creating your Word document. Please try again.')
+    } finally {
+      setTailoredDownloading(false)
     }
   }
 
@@ -289,12 +362,114 @@ export default function ResumeToolPage() {
               )}
             </div>
 
+            {/* Job-specific tailoring */}
+            <div className="card border-2 border-amber-hope">
+              <p className="font-display text-amber-hope text-xl mb-2">
+                Found a job you want to apply for?
+              </p>
+              <p className="font-body text-slate-supporting mb-4">
+                Paste the job description below and we'll customize your resume to match what they're looking for — using your real experience, in your own words.
+              </p>
+
+              <form onSubmit={handleTailor} className="space-y-4">
+                <textarea
+                  value={jobDescription}
+                  onChange={(e) => setJobDescription(e.target.value)}
+                  placeholder="Paste the full job description here..."
+                  rows={10}
+                  className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope"
+                />
+
+                {tailorError && (
+                  <p className="font-body text-sm text-red-700 bg-red-50 rounded-card px-4 py-3">{tailorError}</p>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={!jobDescription.trim() || tailoring}
+                  className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {tailoring ? 'Tailoring your resume…' : 'Tailor My Resume For This Job'}
+                </button>
+                {tailoring && (
+                  <p className="font-body text-slate-supporting text-sm text-center">
+                    This usually takes about a minute. We're comparing your resume against the role — please don't close this tab.
+                  </p>
+                )}
+              </form>
+
+              {tailoringResult && (
+                <div className="mt-8 space-y-6">
+                  <div className="flex items-center gap-3">
+                    <span className="inline-block bg-amber-hope text-navy font-display font-bold text-sm px-4 py-2 rounded-full">
+                      {tailoringResult.match_label} — {tailoringResult.match_score}%
+                    </span>
+                  </div>
+
+                  <div>
+                    <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">
+                      Why You're a Strong Candidate
+                    </p>
+                    <ul className="space-y-2">
+                      {tailoringResult.top_strengths.map((s, i) => (
+                        <li key={i} className="flex gap-2 font-body text-navy text-sm">
+                          <span className="text-amber-hope">✓</span>{s}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {tailoringResult.honest_gaps.length > 0 && (
+                    <div className="bg-sage rounded-card p-4">
+                      <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">
+                        Worth Preparing For
+                      </p>
+                      <ul className="space-y-3">
+                        {tailoringResult.honest_gaps.map((g, i) => (
+                          <li key={i} className="font-body text-navy text-sm">
+                            <p className="font-medium mb-1">{g.gap}</p>
+                            <p className="text-slate-supporting">{g.guidance}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div>
+                    <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">
+                      Tailored Resume
+                    </p>
+                    <div className="bg-warm-white rounded-card p-6 border border-sage">
+                      <MarkdownView content={tailoringResult.tailored_resume_markdown} />
+                    </div>
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={handleDownloadTailored}
+                        disabled={tailoredDownloading}
+                        className="btn-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {tailoredDownloading ? 'Preparing your document…' : 'Download Tailored Resume'}
+                      </button>
+                      {tailoredDownloadError && (
+                        <p className="font-body text-sm text-red-700 bg-red-50 rounded-card px-4 py-3 mt-3 inline-block">
+                          {tailoredDownloadError}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
             <div className="flex gap-4">
               <button
                 onClick={() => {
                   setResult(null)
                   setFile(null)
                   setError(null)
+                  setJobDescription('')
+                  setTailoringResult(null)
+                  setTailorError(null)
                 }}
                 className="btn-secondary"
               >
