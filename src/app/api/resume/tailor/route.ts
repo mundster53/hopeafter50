@@ -50,7 +50,15 @@ export async function POST(req: NextRequest) {
       extraSystemInstruction: isAge50Plus ? AGE_50_PLUS_INSTRUCTION : undefined,
     })
 
-    return NextResponse.json({ success: true, tailoring })
+    return NextResponse.json({
+      success: true,
+      tailoring: {
+        ...tailoring,
+        top_strengths: tailoring.top_strengths ?? [],
+        honest_gaps: tailoring.honest_gaps ?? [],
+        keywords_incorporated: tailoring.keywords_incorporated ?? [],
+      },
+    })
   } catch (err) {
     console.error('Resume Tailoring API error:', err)
     return NextResponse.json(
