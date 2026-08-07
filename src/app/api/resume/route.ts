@@ -5,25 +5,21 @@
 // 2. Store the original file in Vercel Blob
 // 3. Run prompts/resume-analysis.md, then prompts/resume-optimization.md
 // 4. Persist both results and return them
+//
+// The member's very first upload becomes their permanent "base resume"
+// (Member.baseResumeText) — it is set once and never overwritten. Every
+// analysis/optimization run after that is a new, separate history entry;
+// none of them ever modify the base.
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db/client'
-import { runStructuredPrompt } from '@/lib/ai/anthropic'
-import { getMemberAiContext } from '@/lib/ai/context'
-import { AGE_50_PLUS_INSTRUCTION } from '@/lib/ai/agePolicy'
 import { extractResumeText } from '@/lib/resume/extractText'
 import { uploadMemberFile } from '@/lib/storage/blob'
-import { ResumeAnalysisResult, ResumeOptimizationResult } from '@/types/ai'
+import { runAnalysisAndOptimization } from '@/lib/resume/analyze'
 
 export const runtime = 'nodejs'
-
-const AGE_DATING_SUGGESTION_PATTERN = /graduation year|early career.{0,20}date|date.{0,20}early career/i
-
-function isAgeDatingSuggestion(suggestion: string): boolean {
-  return AGE_DATING_SUGGESTION_PATTERN.test(suggestion)
-}
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -51,86 +47,29 @@ export async function POST(req: NextRequest) {
     }
 
     const resumeFileUrl = await uploadMemberFile(file, 'resumes', memberId)
-    const { member, assessment_analysis, isAge50Plus } = await getMemberAiContext(memberId)
 
-    // Step 1: Resume Analysis (prompts/resume-analysis.md)
-    const analysis = await runStructuredPrompt<ResumeAnalysisResult>({
-      promptFile: 'resume-analysis.md',
-      input: {
-        member,
-        resume_text: resumeText,
-        target_roles: targetRoles,
-        target_industries: targetIndustries,
-        career_preferences: {},
-        assessment_analysis,
-      },
-      maxTokens: 4096,
-      extraSystemInstruction: isAge50Plus ? AGE_50_PLUS_INSTRUCTION : undefined,
+    // The first upload becomes the member's permanent base resume. It is
+    // never overwritten by later uploads, optimizations, or tailoring.
+    const member = await prisma.member.findUnique({
+      where: { id: memberId },
+      select: { baseResumeText: true },
     })
-
-    const savedAnalysis = await prisma.resumeAnalysis.create({
-      data: {
-        memberId,
-        resumeFileUrl,
-        resumeText,
-        targetRoles,
-        targetIndustries,
-        analysis: analysis as any,
-        atsRating: analysis.ats_rating,
-        overallRating: analysis.overall_rating,
-      },
-    })
-
-    // Step 2: Resume Optimization (prompts/resume-optimization.md)
-    const optimization = await runStructuredPrompt<ResumeOptimizationResult>({
-      promptFile: 'resume-optimization.md',
-      input: {
-        original_resume: resumeText,
-        resume_analysis: analysis,
-        assessment_analysis,
-        target_roles: targetRoles,
-        target_industries: targetIndustries,
-        career_preferences: {},
-      },
-      maxTokens: 8192,
-      extraSystemInstruction: isAge50Plus ? AGE_50_PLUS_INSTRUCTION : undefined,
-    })
-
-    if (isAge50Plus) {
-      optimization.recommended_follow_up = optimization.recommended_follow_up.filter(
-        (suggestion) => !isAgeDatingSuggestion(suggestion)
-      )
+    if (member && !member.baseResumeText) {
+      await prisma.member.update({
+        where: { id: memberId },
+        data: { baseResumeText: resumeText, baseResumeFileUrl: resumeFileUrl, baseResumeSetAt: new Date() },
+      })
     }
 
-    const savedOptimization = await prisma.resumeOptimization.create({
-      data: {
-        memberId,
-        resumeAnalysisId: savedAnalysis.id,
-        optimizedResumeMarkdown: optimization.optimized_resume_markdown,
-        majorChanges: optimization.major_changes,
-        recommendedFollowUp: optimization.recommended_follow_up,
-        confidence: optimization.confidence,
-      },
+    const result = await runAnalysisAndOptimization({
+      memberId,
+      resumeText,
+      resumeFileUrl,
+      targetRoles,
+      targetIndustries,
     })
 
-    await prisma.memberMilestone.upsert({
-      where: { memberId_milestoneId: { memberId, milestoneId: 'resume_uploaded' } },
-      create: { memberId, milestoneId: 'resume_uploaded' },
-      update: {},
-    })
-    await prisma.memberMilestone.upsert({
-      where: { memberId_milestoneId: { memberId, milestoneId: 'resume_optimized' } },
-      create: { memberId, milestoneId: 'resume_optimized' },
-      update: {},
-    })
-
-    return NextResponse.json({
-      success: true,
-      analysisId: savedAnalysis.id,
-      analysis,
-      optimizationId: savedOptimization.id,
-      optimization,
-    })
+    return NextResponse.json({ success: true, ...result })
   } catch (err) {
     console.error('Resume Intelligence API error:', err)
     return NextResponse.json(
@@ -145,18 +84,46 @@ export async function GET() {
   if (!session?.user?.id) {
     return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 })
   }
+  const memberId = session.user.id
 
   const analyses = await prisma.resumeAnalysis.findMany({
-    where: { memberId: session.user.id },
+    where: { memberId },
     orderBy: { createdAt: 'desc' },
   })
 
   const optimizations = await prisma.resumeOptimization.findMany({
-    where: { memberId: session.user.id },
+    where: { memberId },
     orderBy: { createdAt: 'desc' },
   })
 
-  return NextResponse.json({ success: true, analyses, optimizations })
+  // Convenience pairing: the most recent analysis and its matching
+  // optimization, so the frontend can restore the tool's last session
+  // without re-uploading.
+  const latestAnalysis = analyses[0] ?? null
+  const latestOptimization = latestAnalysis
+    ? optimizations.find((o) => o.resumeAnalysisId === latestAnalysis.id) ?? optimizations[0] ?? null
+    : null
+
+  return NextResponse.json({
+    success: true,
+    analyses,
+    optimizations,
+    latest: latestAnalysis && latestOptimization
+      ? {
+          analysisId: latestAnalysis.id,
+          analysis: latestAnalysis.analysis,
+          optimizationId: latestOptimization.id,
+          optimization: {
+            optimized_resume_markdown: latestOptimization.optimizedResumeMarkdown,
+            major_changes: latestOptimization.majorChanges,
+            recommended_follow_up: latestOptimization.recommendedFollowUp,
+            confidence: latestOptimization.confidence,
+          },
+          targetRoles: latestAnalysis.targetRoles,
+          targetIndustries: latestAnalysis.targetIndustries,
+        }
+      : null,
+  })
 }
 
 function splitList(value: FormDataEntryValue | null): string[] {

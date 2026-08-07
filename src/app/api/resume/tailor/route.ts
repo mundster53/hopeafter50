@@ -6,6 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { prisma } from '@/lib/db/client'
 import { runStructuredPrompt } from '@/lib/ai/anthropic'
 import { getMemberAiContext } from '@/lib/ai/context'
 import { AGE_50_PLUS_INSTRUCTION } from '@/lib/ai/agePolicy'
@@ -21,7 +22,7 @@ export async function POST(req: NextRequest) {
   const memberId = session.user.id
 
   try {
-    const { optimizedResumeMarkdown, jobDescription } = await req.json()
+    const { optimizedResumeMarkdown, jobDescription, resumeOptimizationId } = await req.json()
 
     if (typeof optimizedResumeMarkdown !== 'string' || !optimizedResumeMarkdown.trim()) {
       return NextResponse.json(
@@ -50,15 +51,28 @@ export async function POST(req: NextRequest) {
       extraSystemInstruction: isAge50Plus ? AGE_50_PLUS_INSTRUCTION : undefined,
     })
 
-    return NextResponse.json({
-      success: true,
-      tailoring: {
-        ...tailoring,
-        top_strengths: tailoring.top_strengths ?? [],
-        honest_gaps: tailoring.honest_gaps ?? [],
-        keywords_incorporated: tailoring.keywords_incorporated ?? [],
+    const normalizedTailoring = {
+      ...tailoring,
+      top_strengths: tailoring.top_strengths ?? [],
+      honest_gaps: tailoring.honest_gaps ?? [],
+      keywords_incorporated: tailoring.keywords_incorporated ?? [],
+    }
+
+    // Tailored resumes are a separate, versioned output — this never
+    // touches the member's base resume or their optimized resume.
+    await prisma.resumeTailoring.create({
+      data: {
+        memberId,
+        resumeOptimizationId: typeof resumeOptimizationId === 'string' ? resumeOptimizationId : null,
+        jobDescription,
+        tailoredResumeMarkdown: normalizedTailoring.tailored_resume_markdown,
+        matchScore: normalizedTailoring.match_score ?? null,
+        matchLabel: normalizedTailoring.match_label ?? null,
+        tailoring: normalizedTailoring as any,
       },
     })
+
+    return NextResponse.json({ success: true, tailoring: normalizedTailoring })
   } catch (err) {
     console.error('Resume Tailoring API error:', err)
     return NextResponse.json(

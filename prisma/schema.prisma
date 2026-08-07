@@ -78,6 +78,14 @@ model Member {
   createdAt                DateTime  @default(now())
   updatedAt                DateTime  @updatedAt
 
+  // The member's original uploaded resume text, captured once on their
+  // first upload and never overwritten. Optimized and tailored resumes
+  // are always derived copies stored separately (ResumeAnalysis /
+  // ResumeOptimization / ResumeTailoring) — this is the permanent source.
+  baseResumeText           String?   @db.Text
+  baseResumeFileUrl        String?
+  baseResumeSetAt          DateTime?
+
   assessment    Assessment?
   rebuildPlan   RebuildPlan?
   weeklyCheckIns WeeklyCheckIn[]
@@ -85,6 +93,7 @@ model Member {
 
   resumeAnalyses        ResumeAnalysis[]
   resumeOptimizations   ResumeOptimization[]
+  resumeTailorings      ResumeTailoring[]
   opportunityEvaluations OpportunityEvaluation[]
   coverLetters          CoverLetter[]
   interviewPreps        InterviewPrep[]
@@ -197,6 +206,19 @@ model ResumeOptimization {
   recommendedFollowUp    String[]
   confidence             String?
   createdAt              DateTime        @default(now())
+}
+
+model ResumeTailoring {
+  id                     String   @id @default(cuid())
+  memberId               String
+  member                 Member   @relation(fields: [memberId], references: [id])
+  resumeOptimizationId   String?
+  jobDescription         String   @db.Text
+  tailoredResumeMarkdown String   @db.Text
+  matchScore             Int?
+  matchLabel             String?
+  tailoring              Json     // full prompts/resume-tailoring.md output
+  createdAt              DateTime @default(now())
 }
 
 model OpportunityEvaluation {

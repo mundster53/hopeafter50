@@ -5,10 +5,11 @@
 // ============================================================
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import MarkdownView from '@/components/platform/MarkdownView'
 import RatingBadge from '@/components/platform/RatingBadge'
+import AnalysisProgress from '@/components/platform/AnalysisProgress'
 import { ResumeAnalysisResult, ResumeOptimizationResult, ResumeTailoringResult } from '@/types/ai'
 
 type ApiResult = {
@@ -29,6 +30,10 @@ const CATEGORY_LABELS: Record<keyof ResumeAnalysisResult['category_scores'], str
 }
 
 export default function ResumeToolPage() {
+  const [checkingHistory, setCheckingHistory] = useState(true)
+  const [loadedFromHistory, setLoadedFromHistory] = useState(false)
+  const [optimizationId, setOptimizationId] = useState<string | null>(null)
+
   const [file, setFile] = useState<File | null>(null)
   const [targetRoles, setTargetRoles] = useState('')
   const [targetIndustries, setTargetIndustries] = useState('')
@@ -38,12 +43,44 @@ export default function ResumeToolPage() {
   const [downloading, setDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
 
+  const [reanalyzing, setReanalyzing] = useState(false)
+  const [reanalyzeError, setReanalyzeError] = useState<string | null>(null)
+
   const [jobDescription, setJobDescription] = useState('')
   const [tailoring, setTailoring] = useState(false)
   const [tailorError, setTailorError] = useState<string | null>(null)
   const [tailoringResult, setTailoringResult] = useState<ResumeTailoringResult | null>(null)
   const [tailoredDownloading, setTailoredDownloading] = useState(false)
   const [tailoredDownloadError, setTailoredDownloadError] = useState<string | null>(null)
+
+  // On arrival, check for a previously analyzed resume so members never
+  // have to upload the same resume twice.
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadHistory() {
+      try {
+        const res = await fetch('/api/resume')
+        const data = await res.json()
+        if (!cancelled && res.ok && data.success && data.latest) {
+          setResult({ analysis: data.latest.analysis, optimization: data.latest.optimization })
+          setOptimizationId(data.latest.optimizationId)
+          setTargetRoles((data.latest.targetRoles ?? []).join(', '))
+          setTargetIndustries((data.latest.targetIndustries ?? []).join(', '))
+          setLoadedFromHistory(true)
+        }
+      } catch (err) {
+        console.error(err)
+      } finally {
+        if (!cancelled) setCheckingHistory(false)
+      }
+    }
+
+    loadHistory()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -66,12 +103,60 @@ export default function ResumeToolPage() {
       }
 
       setResult({ analysis: data.analysis, optimization: data.optimization })
+      setOptimizationId(data.optimizationId ?? null)
+      setLoadedFromHistory(false)
     } catch (err) {
       console.error(err)
       setError('Something went wrong. Please try again.')
     } finally {
       setLoading(false)
     }
+  }
+
+  async function handleReanalyze() {
+    setReanalyzing(true)
+    setReanalyzeError(null)
+
+    try {
+      const roles = targetRoles.split(',').map((v) => v.trim()).filter(Boolean)
+      const industries = targetIndustries.split(',').map((v) => v.trim()).filter(Boolean)
+
+      const res = await fetch('/api/resume/reanalyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ targetRoles: roles, targetIndustries: industries }),
+      })
+      const data = await res.json()
+
+      if (!res.ok || !data.success) {
+        setReanalyzeError(data.error ?? 'Something went wrong. Please try again.')
+        return
+      }
+
+      setResult({ analysis: data.analysis, optimization: data.optimization })
+      setOptimizationId(data.optimizationId ?? null)
+      setLoadedFromHistory(false)
+      setTailoringResult(null)
+    } catch (err) {
+      console.error(err)
+      setReanalyzeError('Something went wrong. Please try again.')
+    } finally {
+      setReanalyzing(false)
+    }
+  }
+
+  function handleUploadNew() {
+    setResult(null)
+    setOptimizationId(null)
+    setLoadedFromHistory(false)
+    setFile(null)
+    setTargetRoles('')
+    setTargetIndustries('')
+    setError(null)
+    setReanalyzeError(null)
+    setJobDescription('')
+    setTailoringResult(null)
+    setTailorError(null)
   }
 
   async function handleDownload() {
@@ -122,6 +207,7 @@ export default function ResumeToolPage() {
         body: JSON.stringify({
           optimizedResumeMarkdown: result.optimization.optimized_resume_markdown,
           jobDescription,
+          resumeOptimizationId: optimizationId,
         }),
       })
       const data = await res.json()
@@ -191,7 +277,13 @@ export default function ResumeToolPage() {
           Upload your resume and we'll show you exactly what's working, what's not, and how to fix it — in plain language, in your own words.
         </p>
 
-        {!result && (
+        {checkingHistory && (
+          <div className="card text-center py-12">
+            <p className="font-body text-slate-supporting">Checking for your resume…</p>
+          </div>
+        )}
+
+        {!checkingHistory && !result && (
           <form onSubmit={handleSubmit} className="card space-y-6">
             <div className="border-2 border-dashed border-sage rounded-card text-center py-12 px-6">
               <p className="font-display text-xl text-navy mb-2">Upload Your Résumé</p>
@@ -239,16 +331,40 @@ export default function ResumeToolPage() {
             <button type="submit" disabled={!file || loading} className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed">
               {loading ? 'Analyzing your resume…' : 'Analyze My Resume'}
             </button>
-            {loading && (
-              <p className="font-body text-slate-supporting text-sm text-center">
-                This usually takes about a minute. We're reading closely — please don't close this tab.
-              </p>
-            )}
+            {loading && <AnalysisProgress />}
           </form>
         )}
 
         {result && (
           <div className="space-y-8">
+
+            {loadedFromHistory && (
+              <div className="card bg-sage flex flex-wrap items-center justify-between gap-4">
+                <p className="font-body text-navy text-sm">
+                  Welcome back — here's your most recent resume analysis.
+                </p>
+                <div className="flex gap-3">
+                  <button
+                    onClick={handleReanalyze}
+                    disabled={reanalyzing}
+                    className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {reanalyzing ? 'Re-analyzing…' : 'Re-analyze'}
+                  </button>
+                  <button onClick={handleUploadNew} className="btn-primary">
+                    Upload New Resume
+                  </button>
+                </div>
+              </div>
+            )}
+            {reanalyzeError && (
+              <p className="font-body text-sm text-red-700 bg-red-50 rounded-card px-4 py-3">{reanalyzeError}</p>
+            )}
+            {reanalyzing && (
+              <div className="card">
+                <AnalysisProgress />
+              </div>
+            )}
 
             {/* Ratings row */}
             <div className="card">
@@ -391,11 +507,7 @@ export default function ResumeToolPage() {
                 >
                   {tailoring ? 'Tailoring your resume…' : 'Tailor My Resume For This Job'}
                 </button>
-                {tailoring && (
-                  <p className="font-body text-slate-supporting text-sm text-center">
-                    This usually takes about a minute. We're comparing your resume against the role — please don't close this tab.
-                  </p>
-                )}
+                {tailoring && <AnalysisProgress />}
               </form>
 
               {tailoringResult && (
@@ -462,18 +574,11 @@ export default function ResumeToolPage() {
             </div>
 
             <div className="flex gap-4">
-              <button
-                onClick={() => {
-                  setResult(null)
-                  setFile(null)
-                  setError(null)
-                  setJobDescription('')
-                  setTailoringResult(null)
-                  setTailorError(null)
-                }}
-                className="btn-secondary"
-              >
-                Analyze Another Version
+              <button onClick={handleReanalyze} disabled={reanalyzing} className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed">
+                {reanalyzing ? 'Re-analyzing…' : 'Re-analyze'}
+              </button>
+              <button onClick={handleUploadNew} className="btn-secondary">
+                Upload New Resume
               </button>
               <Link href="/platform/dashboard" className="btn-primary">Back to Dashboard</Link>
             </div>
