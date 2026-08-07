@@ -40,6 +40,17 @@ function describeDuration(since: Date, now: Date): string {
   return `${months} month${months === 1 ? '' : 's'}`
 }
 
+export function daysSinceJobLoss(since: Date, now: Date): number {
+  return Math.max(0, Math.floor((now.getTime() - since.getTime()) / 86_400_000))
+}
+
+function emotionalStageFor(days: number): string {
+  if (days <= 30) return 'shock_momentum'
+  if (days <= 90) return 'doubt_setting_in'
+  if (days <= 180) return 'fear_is_real'
+  return 'exhaustion_identity'
+}
+
 /**
  * Returns today's Daily Word for a member, generating and caching it on
  * first request of the day. Safe to call repeatedly — later calls the
@@ -55,9 +66,12 @@ export async function getDailyEncouragement(memberId: string, now: Date = new Da
 
   const member = await prisma.member.findUnique({
     where: { id: memberId },
-    include: { rebuildPlan: true },
+    include: { rebuildPlan: true, assessment: true },
   })
   if (!member) return null
+
+  const jobLossSince = member.assessment?.jobLossDate ?? member.assessment?.completedAt ?? member.createdAt
+  const days = daysSinceJobLoss(jobLossSince, now)
 
   const message = (
     await runTextPrompt({
@@ -66,6 +80,10 @@ export async function getDailyEncouragement(memberId: string, now: Date = new Da
         member: { firstName: member.firstName },
         current_stage: member.rebuildPlan?.currentStage ?? 'stabilize',
         rebuilding_since: describeDuration(member.createdAt, now),
+        days_since_job_loss: days,
+        emotional_stage: emotionalStageFor(days),
+        primary_fear: member.assessment?.primaryFear ?? null,
+        success_vision: member.assessment?.successVision ?? null,
       },
       maxTokens: 300,
     })

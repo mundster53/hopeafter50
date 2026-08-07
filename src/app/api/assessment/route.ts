@@ -27,6 +27,7 @@ export async function POST(req: NextRequest) {
       gender: body.gender,
       situation: body.situation,
       lastRole: body.lastRole,
+      jobLossDate: body.jobLossDate ? new Date(`${body.jobLossDate}-01T00:00:00.000Z`) : undefined,
       rebuildDuration: body.rebuildDuration,
       primaryFear: body.primaryFear,
       clarityLevel: body.clarityLevel,
@@ -64,6 +65,7 @@ export async function POST(req: NextRequest) {
           memberId,
           situation: assessment.situation,
           lastRole: assessment.lastRole,
+          jobLossDate: assessment.jobLossDate,
           rebuildDuration: assessment.rebuildDuration,
           primaryFear: assessment.primaryFear,
           clarityLevel: assessment.clarityLevel,
@@ -79,6 +81,7 @@ export async function POST(req: NextRequest) {
         update: {
           situation: assessment.situation,
           lastRole: assessment.lastRole,
+          jobLossDate: assessment.jobLossDate,
           rebuildDuration: assessment.rebuildDuration,
           primaryFear: assessment.primaryFear,
           clarityLevel: assessment.clarityLevel,

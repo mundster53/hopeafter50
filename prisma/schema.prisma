@@ -110,6 +110,7 @@ model Assessment {
 
   situation           String
   lastRole            String?
+  jobLossDate         DateTime?
   rebuildDuration     String
   primaryFear         String
   clarityLevel        String

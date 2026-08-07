@@ -93,6 +93,9 @@ export interface Assessment {
   // Q2
   situation: SituationType
 
+  // Q2b
+  jobLossDate?: Date
+
   // Q3
   lastRole?: string
 

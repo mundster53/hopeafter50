@@ -9,7 +9,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 
 // Question index
-const TOTAL_QUESTIONS = 15
+const TOTAL_QUESTIONS = 16
 
 export default function AssessmentPage() {
   const router = useRouter()
@@ -76,19 +76,20 @@ export default function AssessmentPage() {
         {step === 0 && <WelcomeStep onNext={() => setStep(1)} />}
         {step === 1 && <Q1 answers={answers} update={update} onNext={() => setStep(2)} />}
         {step === 2 && <Q2 answers={answers} update={update} onNext={() => setStep(3)} onBack={() => setStep(1)} />}
-        {step === 3 && <Q3LastRole answers={answers} update={update} onNext={() => setStep(4)} onBack={() => setStep(2)} />}
-        {step === 4 && <Q4 answers={answers} update={update} onNext={() => setStep(5)} onBack={() => setStep(3)} />}
-        {step === 5 && <Q5 answers={answers} update={update} onNext={() => setStep(6)} onBack={() => setStep(4)} />}
-        {step === 6 && <Q6 answers={answers} update={update} onNext={() => setStep(7)} onBack={() => setStep(5)} />}
-        {step === 7 && <Q7 answers={answers} toggle={(v: string) => toggleMulti('workInterests', v)} onNext={() => setStep(8)} onBack={() => setStep(6)} />}
-        {step === 8 && <Q8 answers={answers} update={update} onNext={() => setStep(9)} onBack={() => setStep(7)} />}
-        {step === 9 && <Q9 answers={answers} update={update} onNext={() => setStep(10)} onBack={() => setStep(8)} />}
-        {step === 10 && <Q10 answers={answers} update={update} onNext={() => setStep(11)} onBack={() => setStep(9)} />}
-        {step === 11 && <Q11 answers={answers} update={update} onNext={() => setStep(12)} onBack={() => setStep(10)} />}
-        {step === 12 && <Q12 answers={answers} update={update} onNext={() => setStep(13)} onBack={() => setStep(11)} />}
-        {step === 13 && <Q13 answers={answers} update={update} onNext={() => setStep(14)} onBack={() => setStep(12)} />}
-        {step === 14 && <Q14 answers={answers} update={update} onNext={() => setStep(15)} onBack={() => setStep(13)} />}
-        {step === 15 && <Q15 answers={answers} update={update} onSubmit={handleSubmit} onBack={() => setStep(14)} submitting={submitting} />}
+        {step === 3 && <Q2b answers={answers} update={update} onNext={() => setStep(4)} onBack={() => setStep(2)} />}
+        {step === 4 && <Q3LastRole answers={answers} update={update} onNext={() => setStep(5)} onBack={() => setStep(3)} />}
+        {step === 5 && <Q4 answers={answers} update={update} onNext={() => setStep(6)} onBack={() => setStep(4)} />}
+        {step === 6 && <Q5 answers={answers} update={update} onNext={() => setStep(7)} onBack={() => setStep(5)} />}
+        {step === 7 && <Q6 answers={answers} update={update} onNext={() => setStep(8)} onBack={() => setStep(6)} />}
+        {step === 8 && <Q7 answers={answers} toggle={(v: string) => toggleMulti('workInterests', v)} onNext={() => setStep(9)} onBack={() => setStep(7)} />}
+        {step === 9 && <Q8 answers={answers} update={update} onNext={() => setStep(10)} onBack={() => setStep(8)} />}
+        {step === 10 && <Q9 answers={answers} update={update} onNext={() => setStep(11)} onBack={() => setStep(9)} />}
+        {step === 11 && <Q10 answers={answers} update={update} onNext={() => setStep(12)} onBack={() => setStep(10)} />}
+        {step === 12 && <Q11 answers={answers} update={update} onNext={() => setStep(13)} onBack={() => setStep(11)} />}
+        {step === 13 && <Q12 answers={answers} update={update} onNext={() => setStep(14)} onBack={() => setStep(12)} />}
+        {step === 14 && <Q13 answers={answers} update={update} onNext={() => setStep(15)} onBack={() => setStep(13)} />}
+        {step === 15 && <Q14 answers={answers} update={update} onNext={() => setStep(16)} onBack={() => setStep(14)} />}
+        {step === 16 && <Q15 answers={answers} update={update} onSubmit={handleSubmit} onBack={() => setStep(15)} submitting={submitting} />}
       </div>
     </div>
   )
@@ -279,6 +280,57 @@ function Q2({ answers, update, onNext, onBack }: any) {
         ))}
       </div>
       <NavButtons onBack={onBack} onNext={onNext} disabled={!answers.situation} />
+    </div>
+  )
+}
+
+// ----------------------------
+// Q2b — Job loss date
+// ----------------------------
+function Q2b({ answers, update, onNext, onBack }: any) {
+  const months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ]
+  const currentYear = new Date().getFullYear()
+  const years = Array.from({ length: 15 }, (_, i) => currentYear - i)
+
+  const jobLossDate: string = answers.jobLossDate || ''
+  const [selMonth, selYear] = jobLossDate ? jobLossDate.split('-') : ['', '']
+
+  function setMonthYear(month: string, year: string) {
+    if (month && year) {
+      update('jobLossDate', `${year}-${month.padStart(2, '0')}`)
+    }
+  }
+
+  return (
+    <div>
+      <QuestionLabel>When did this happen?</QuestionLabel>
+      <QuestionNote>Knowing how long you&rsquo;ve been carrying this helps us support you better.</QuestionNote>
+      <div className="flex gap-4 mb-6">
+        <select
+          value={selMonth}
+          onChange={e => setMonthYear(e.target.value, selYear)}
+          className="flex-1 border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope bg-white"
+        >
+          <option value="">Month</option>
+          {months.map((m, i) => (
+            <option key={m} value={String(i + 1)}>{m}</option>
+          ))}
+        </select>
+        <select
+          value={selYear}
+          onChange={e => setMonthYear(selMonth, e.target.value)}
+          className="flex-1 border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope bg-white"
+        >
+          <option value="">Year</option>
+          {years.map(y => (
+            <option key={y} value={String(y)}>{y}</option>
+          ))}
+        </select>
+      </div>
+      <NavButtons onBack={onBack} onNext={onNext} />
     </div>
   )
 }
