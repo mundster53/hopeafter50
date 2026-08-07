@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     const checkoutSession = event.data.object as Stripe.Checkout.Session
     const email = checkoutSession.customer_details?.email ?? checkoutSession.customer_email
     const memberId = checkoutSession.metadata?.memberId || null
-    const interval = checkoutSession.metadata?.interval === 'month' ? 'monthly' : 'one_time'
+    const interval = checkoutSession.metadata?.mode === 'subscription' ? 'monthly' : 'one_time'
     const amount = checkoutSession.amount_total ?? 0
 
     if (email) {

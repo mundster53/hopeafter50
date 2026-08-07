@@ -9,23 +9,23 @@ import Link from 'next/link'
 
 type Tier = {
   amount: string
-  amountCents: number
-  interval: 'month' | 'one_time'
+  priceId: string
+  mode: 'subscription' | 'payment'
   description: string
   cta: string
   featured?: boolean
 }
 
 const RECURRING_TIERS: Tier[] = [
-  { amount: '$11/month', amountCents: 1100, interval: 'month', description: 'Less than a cup of coffee a week. Keeps one member\'s tools running for a month.', cta: 'Become a Partner', featured: true },
-  { amount: '$25/month', amountCents: 2500, interval: 'month', description: 'Covers platform costs for one week', cta: 'Become a Partner' },
-  { amount: '$50/month', amountCents: 5000, interval: 'month', description: 'Funds a month of AI tools for five members', cta: 'Become a Partner' },
+  { amount: '$11/month', priceId: 'price_1U1u4SP3pCt2RBbZJUahh3mR', mode: 'subscription', description: 'Less than a cup of coffee a week. Keeps one member\'s tools running for a month.', cta: 'Become a Partner', featured: true },
+  { amount: '$25/month', priceId: 'price_1U1u5BP3pCt2RBbZpsy2m7HQ', mode: 'subscription', description: 'Covers platform costs for one week', cta: 'Become a Partner' },
+  { amount: '$50/month', priceId: 'price_1U1u63P3pCt2RBbZAAL9cQ8D', mode: 'subscription', description: 'Funds a month of AI tools for five members', cta: 'Become a Partner' },
 ]
 
 const ONE_TIME_TIERS: Tier[] = [
-  { amount: '$25', amountCents: 2500, interval: 'one_time', description: 'A simple thank you', cta: 'Give Once' },
-  { amount: '$50', amountCents: 5000, interval: 'one_time', description: 'Help someone else find their next step', cta: 'Give Once' },
-  { amount: '$11', amountCents: 1100, interval: 'one_time', description: 'A simple thank you', cta: 'Give Once' },
+  { amount: '$25', priceId: 'price_1U1u6uP3pCt2RBbZGIHWp9nT', mode: 'payment', description: 'A simple thank you', cta: 'Give Once' },
+  { amount: '$50', priceId: 'price_1U1u7UP3pCt2RBbZEa0f9RW1', mode: 'payment', description: 'Help someone else find their next step', cta: 'Give Once' },
+  { amount: '$100', priceId: 'price_1U1u8GP3pCt2RBbZlZnAZ81S', mode: 'payment', description: 'A generous gift', cta: 'Give Once' },
 ]
 
 function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Tier) => void; loading: boolean }) {
@@ -56,18 +56,18 @@ function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Ti
 }
 
 export default function PartnerPage() {
-  const [pendingAmount, setPendingAmount] = useState<number | null>(null)
+  const [pendingPriceId, setPendingPriceId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
 
   async function handleSelect(tier: Tier) {
     setError(null)
-    setPendingAmount(tier.amountCents)
+    setPendingPriceId(tier.priceId)
 
     try {
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount: tier.amountCents, interval: tier.interval }),
+        body: JSON.stringify({ priceId: tier.priceId, mode: tier.mode }),
       })
       const data = await res.json()
 
@@ -79,7 +79,7 @@ export default function PartnerPage() {
     } catch (err) {
       console.error(err)
       setError('Something went wrong starting checkout. Please try again.')
-      setPendingAmount(null)
+      setPendingPriceId(null)
     }
   }
 
@@ -121,7 +121,7 @@ export default function PartnerPage() {
                 key={tier.amount}
                 tier={tier}
                 onSelect={handleSelect}
-                loading={pendingAmount === tier.amountCents}
+                loading={pendingPriceId === tier.priceId}
               />
             ))}
           </div>
@@ -138,7 +138,7 @@ export default function PartnerPage() {
                 key={tier.amount}
                 tier={tier}
                 onSelect={handleSelect}
-                loading={pendingAmount === tier.amountCents}
+                loading={pendingPriceId === tier.priceId}
               />
             ))}
           </div>

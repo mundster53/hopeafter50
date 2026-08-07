@@ -8,8 +8,8 @@ import Stripe from 'stripe'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
-const SUCCESS_URL = 'https://www.hopeafter50.org/platform/dashboard?partner=true'
-const CANCEL_URL = 'https://www.hopeafter50.org/platform/plan/partner'
+const SUCCESS_URL = 'https://hopeafter50-52n2tz2pb-bret-mundts-projects.vercel.app/platform/dashboard?partner=true'
+const CANCEL_URL = 'https://hopeafter50-52n2tz2pb-bret-mundts-projects.vercel.app/platform/plan/partner'
 
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY) {
@@ -21,16 +21,15 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
-    const { amount, interval, email } = body
+    const { priceId, mode, email } = body
 
-    const amountCents = Math.round(Number(amount))
-    if (!Number.isFinite(amountCents) || amountCents <= 0) {
-      return NextResponse.json({ success: false, error: 'A valid amount is required.' }, { status: 400 })
+    if (typeof priceId !== 'string' || !priceId) {
+      return NextResponse.json({ success: false, error: 'A valid priceId is required.' }, { status: 400 })
     }
 
-    if (interval !== 'month' && interval !== 'one_time') {
+    if (mode !== 'subscription' && mode !== 'payment') {
       return NextResponse.json(
-        { success: false, error: 'Interval must be "month" or "one_time".' },
+        { success: false, error: 'mode must be "subscription" or "payment".' },
         { status: 400 }
       )
     }
@@ -38,22 +37,12 @@ export async function POST(req: NextRequest) {
     const donorEmail = email ?? session?.user?.email ?? undefined
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      mode: interval === 'month' ? 'subscription' : 'payment',
+      mode,
       customer_email: donorEmail,
-      line_items: [
-        {
-          price_data: {
-            currency: 'usd',
-            product_data: { name: 'HopeAfter50 Partner Donation' },
-            unit_amount: amountCents,
-            ...(interval === 'month' ? { recurring: { interval: 'month' as const } } : {}),
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: [{ price: priceId, quantity: 1 }],
       metadata: {
         memberId: session?.user?.id ?? '',
-        interval,
+        mode,
       },
       success_url: SUCCESS_URL,
       cancel_url: CANCEL_URL,
