@@ -13,10 +13,11 @@ type Tier = {
   interval: 'month' | 'one_time'
   description: string
   cta: string
+  featured?: boolean
 }
 
 const RECURRING_TIERS: Tier[] = [
-  { amount: '$10/month', amountCents: 1000, interval: 'month', description: "Sponsors one member's access for a month", cta: 'Become a Partner' },
+  { amount: '$11/month', amountCents: 1100, interval: 'month', description: 'Less than a cup of coffee a week. Keeps one member\'s tools running for a month.', cta: 'Become a Partner', featured: true },
   { amount: '$25/month', amountCents: 2500, interval: 'month', description: 'Covers platform costs for one week', cta: 'Become a Partner' },
   { amount: '$50/month', amountCents: 5000, interval: 'month', description: 'Funds a month of AI tools for five members', cta: 'Become a Partner' },
 ]
@@ -24,12 +25,23 @@ const RECURRING_TIERS: Tier[] = [
 const ONE_TIME_TIERS: Tier[] = [
   { amount: '$25', amountCents: 2500, interval: 'one_time', description: 'A simple thank you', cta: 'Give Once' },
   { amount: '$50', amountCents: 5000, interval: 'one_time', description: 'Help someone else find their next step', cta: 'Give Once' },
-  { amount: '$100', amountCents: 10000, interval: 'one_time', description: 'Cover a month of hope for someone in crisis', cta: 'Give Once' },
+  { amount: '$11', amountCents: 1100, interval: 'one_time', description: 'A simple thank you', cta: 'Give Once' },
 ]
 
 function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Tier) => void; loading: boolean }) {
   return (
-    <div className="bg-navy border border-white/20 rounded-card p-6 hover:border-amber-hope transition">
+    <div
+      className={
+        tier.featured
+          ? 'relative bg-navy border-2 border-amber-hope rounded-card p-6 shadow-lg shadow-amber-hope/20 scale-[1.03] transition'
+          : 'bg-navy border border-white/20 rounded-card p-6 hover:border-amber-hope transition'
+      }
+    >
+      {tier.featured && (
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-hope text-navy text-xs font-body font-semibold tracking-widest uppercase px-3 py-1 rounded-full">
+          Most Popular
+        </span>
+      )}
       <p className="font-display text-2xl text-amber-hope mb-2">{tier.amount}</p>
       <p className="font-body text-white/60 text-sm mb-4">{tier.description}</p>
       <button
