@@ -78,7 +78,7 @@ export default function PartnerPage() {
       window.location.href = data.url
     } catch (err) {
       console.error(err)
-      setError('Something went wrong starting checkout. Please try again.')
+      setError(err instanceof Error ? err.message : 'Something went wrong starting checkout. Please try again.')
       setPendingPriceId(null)
     }
   }
