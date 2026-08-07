@@ -53,6 +53,17 @@ export default function ResumeToolPage() {
   const [tailoredDownloading, setTailoredDownloading] = useState(false)
   const [tailoredDownloadError, setTailoredDownloadError] = useState<string | null>(null)
 
+  const [partnerAskDismissed, setPartnerAskDismissed] = useState(true)
+
+  useEffect(() => {
+    setPartnerAskDismissed(localStorage.getItem('partnerAskDismissed') === 'true')
+  }, [])
+
+  function dismissPartnerAsk() {
+    localStorage.setItem('partnerAskDismissed', 'true')
+    setPartnerAskDismissed(true)
+  }
+
   // On arrival, check for a previously analyzed resume so members never
   // have to upload the same resume twice.
   useEffect(() => {
@@ -572,6 +583,28 @@ export default function ResumeToolPage() {
                 </div>
               )}
             </div>
+
+            {!partnerAskDismissed && (
+              <div className="relative bg-white/5 rounded-card p-6">
+                <button
+                  onClick={dismissPartnerAsk}
+                  aria-label="Dismiss"
+                  className="absolute top-3 right-3 text-slate-supporting hover:text-navy text-lg leading-none"
+                >
+                  ×
+                </button>
+                <p className="font-body text-amber-hope text-xs tracking-widest uppercase mb-2">
+                  This analysis was free because of our Partners
+                </p>
+                <p className="font-body text-white text-sm mb-3">
+                  Someone believed you deserved this kind of help without having to pay for it. If
+                  you'd like to help someone else receive the same, consider becoming a Partner.
+                </p>
+                <Link href="/platform/plan/partner" className="font-body text-amber-hope text-sm hover:underline">
+                  Learn about becoming a Partner →
+                </Link>
+              </div>
+            )}
 
             <div className="flex gap-4">
               <button onClick={handleReanalyze} disabled={reanalyzing} className="btn-secondary disabled:opacity-50 disabled:cursor-not-allowed">

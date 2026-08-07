@@ -1,5 +1,5 @@
 // ============================================================
-// HopeAfter50 — Voluntary Partner Support Page
+// HopeAfter50 — Become a Partner
 // Shown after a member receives their Rebuild Plan
 // ============================================================
 'use client'
@@ -43,7 +43,7 @@ function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Ti
   )
 }
 
-export default function SupportPage() {
+export default function PartnerPage() {
   const [pendingAmount, setPendingAmount] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
 
@@ -77,31 +77,24 @@ export default function SupportPage() {
 
         {/* Eyebrow */}
         <p className="font-body text-amber-hope text-xs tracking-widest uppercase">
-          You're not alone — and neither are they
+          Join the Mission
         </p>
 
         {/* Headline */}
         <h1 className="font-display text-display-md text-white">
-          Someone helped make this possible for you.
+          Become a Hope After 50 Partner.
         </h1>
 
         {/* Body */}
         <p className="font-body text-white/80">
-          Hope After 50 is free because people who believe in this mission chose to make it that way.
-          If this has meant something to you — or if you simply want someone else to have the same
-          experience you just had — here's how you can help.
+          Hope After 50 is free for every member who needs it — because Partners make it possible.
+          When you become a Partner, you're not just giving money. You're making sure the next
+          person who needs this finds it free, just like you did. And every month, you'll receive
+          a personal letter from Bret — what God is showing him, what's happening in the ministry,
+          and who is finding hope.
         </p>
 
         <hr className="border-white/10" />
-
-        {/* Become a Partner */}
-        <div className="space-y-3">
-          <p className="font-body text-amber-hope text-sm tracking-widest uppercase">Become a Partner</p>
-          <p className="font-body text-white/70">
-            Partners make it possible for the next person who needs this to find it free, just like you
-            did. There's no obligation, no pressure, and no difference in what you receive either way.
-          </p>
-        </div>
 
         {error && (
           <p className="font-body text-red-400 text-sm text-center">{error}</p>

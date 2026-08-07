@@ -9,7 +9,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
 const SUCCESS_URL = 'https://www.hopeafter50.org/platform/dashboard?partner=true'
-const CANCEL_URL = 'https://www.hopeafter50.org/platform/plan/support'
+const CANCEL_URL = 'https://www.hopeafter50.org/platform/plan/partner'
 
 export async function POST(req: NextRequest) {
   if (!process.env.STRIPE_SECRET_KEY) {
