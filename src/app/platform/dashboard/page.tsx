@@ -13,6 +13,7 @@ import { TOOLS } from '@/lib/tools'
 import { STAGE_LABELS } from '@/lib/rebuild-engine'
 import { ToolId } from '@/types'
 import SignOutButton from '@/components/platform/SignOutButton'
+import { getDailyEncouragement, chicagoHour, greetingFor } from '@/lib/ai/dailyEncouragement'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -26,6 +27,12 @@ export default async function DashboardPage() {
   }
 
   const data = buildDashboardViewModel(member)
+
+  const now = new Date()
+  const hour = chicagoHour(now)
+  const greeting = greetingFor(hour)
+  const isLateNight = hour >= 0 && hour < 5
+  const dailyEncouragement = await getDailyEncouragement(session.user.id, now).catch(() => null)
 
   return (
     <div className="min-h-screen bg-navy">
@@ -46,6 +53,22 @@ export default async function DashboardPage() {
           <h1 className="font-display text-display-sm text-white">{data.firstName ? `Welcome back, ${data.firstName}` : 'Welcome'}</h1>
           <p className="font-body text-white/70 mt-1">Here's your one step for today.</p>
         </div>
+
+        {/* Daily Word — a personal note before the day's task */}
+        {dailyEncouragement && (
+          <div className="bg-white/5 rounded-card p-6 mb-4">
+            <p className="font-body text-amber-hope text-xs tracking-widest uppercase mb-3">Your Daily Word</p>
+            <p className="font-body text-white/70 text-sm mb-2">
+              {greeting}{data.firstName ? `, ${data.firstName}` : ''}.
+            </p>
+            <p className="font-display text-white text-lg leading-relaxed">{dailyEncouragement.message}</p>
+            {isLateNight && (
+              <p className="font-body text-white/70 text-sm mt-4 italic">
+                Most problems look smaller in the morning. Rest if you can.
+              </p>
+            )}
+          </div>
+        )}
 
         {/* The one thing — always the first, unmissable thing on the page */}
         {!data.hasAssessment ? (

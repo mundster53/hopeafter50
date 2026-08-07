@@ -99,6 +99,7 @@ model Member {
   interviewPreps        InterviewPrep[]
   linkedInOptimizations LinkedInOptimization[]
   partnerDonations      Partner[]
+  dailyEncouragements   DailyEncouragement[]
 }
 
 model Assessment {
@@ -267,6 +268,23 @@ model LinkedInOptimization {
   experience  String?  @db.Text
   analysis    Json     // AI response, based on prompts/resume-analysis.md guidance
   createdAt   DateTime @default(now())
+}
+
+// ============================================================
+// Daily Word — one cached AI encouragement per member per day,
+// shown on the dashboard and sent by the 7am cron email.
+// ============================================================
+
+model DailyEncouragement {
+  id          String    @id @default(cuid())
+  memberId    String
+  member      Member    @relation(fields: [memberId], references: [id])
+  date        String    // "YYYY-MM-DD" in America/Chicago
+  message     String    @db.Text
+  emailSentAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@unique([memberId, date])
 }
 
 // ============================================================
