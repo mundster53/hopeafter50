@@ -42,6 +42,7 @@ export default async function DashboardPage() {
         <div className="flex items-center gap-6">
           <Link href="/platform/tools" className="font-body text-white/70 hover:text-white text-sm transition-colors">Tools</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white text-sm transition-colors">Resources</Link>
+          <Link href="/platform/support" className="font-body text-white/70 hover:text-white text-sm transition-colors">Get Help</Link>
           <SignOutButton />
         </div>
       </nav>
@@ -256,7 +257,7 @@ export default async function DashboardPage() {
 
         {/* Footer */}
         <div className="mt-10 pt-6 border-t border-white/10 flex flex-wrap gap-6 text-sm">
-          <Link href="/help" className="font-body text-white/70 hover:text-white">Need Help?</Link>
+          <Link href="/platform/support" className="font-body text-white/70 hover:text-white">Need Help?</Link>
           <Link href="/platform/messages" className="font-body text-white/70 hover:text-white">Message Us</Link>
           <Link href="/schedule" className="font-body text-white/70 hover:text-white">Schedule a Conversation</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white">Resources</Link>
