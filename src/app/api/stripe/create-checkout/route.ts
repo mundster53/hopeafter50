@@ -8,7 +8,7 @@ import Stripe from 'stripe'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 
-const SUCCESS_URL = 'https://hopeafter50-52n2tz2pb-bret-mundts-projects.vercel.app/platform/dashboard?partner=true'
+const SUCCESS_URL = 'https://www.hopeafter50.org/thank-you/partner'
 const CANCEL_URL = 'https://hopeafter50-52n2tz2pb-bret-mundts-projects.vercel.app/platform/plan/partner'
 
 export async function POST(req: NextRequest) {
