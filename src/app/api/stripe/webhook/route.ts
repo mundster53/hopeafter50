@@ -48,23 +48,27 @@ export async function POST(req: NextRequest) {
         },
       })
 
-      await sendThankYouEmail(email, amount, interval, partner.id)
+      await sendThankYouEmail(email, amount, checkoutSession.created, partner.id)
     }
   }
 
   return NextResponse.json({ received: true })
 }
 
-async function sendThankYouEmail(email: string, amountCents: number, interval: string, partnerId: string) {
+async function sendThankYouEmail(email: string, amountCents: number, createdAt: number, partnerId: string) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   const amount = (amountCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })
-  const cadence = interval === 'monthly' ? 'each month' : 'as a one-time gift'
+  const date = new Date(createdAt * 1000).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 
   try {
     await resend.emails.send({
-      from: `HopeAfter50 <${process.env.FROM_EMAIL ?? 'hello@hopeafter50.org'}>`,
+      from: 'Hope After 50 <noreply@hopeafter50.org>',
       to: email,
-      subject: 'Thank you for partnering with HopeAfter50',
+      subject: 'Thank you for making this possible.',
       html: `
 <!DOCTYPE html>
 <html>
@@ -75,27 +79,29 @@ async function sendThankYouEmail(email: string, amountCents: number, interval: s
       <td align="center">
         <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(27,43,75,0.08);">
           <tr>
-            <td style="background:#1B2B4B;padding:28px 40px;">
-              <p style="margin:0;color:#ffffff;font-size:20px;font-weight:700;font-family:Georgia,serif;">HopeAfter50</p>
-            </td>
-          </tr>
-          <tr>
             <td style="padding:40px;">
-              <p style="margin:0 0 16px;color:#1B2B4B;font-size:24px;font-family:Georgia,serif;line-height:1.3;">
-                Thank you for caring.
+              <p style="margin:0 0 16px;color:#1B2B4B;font-size:16px;line-height:1.6;">Hi,</p>
+              <p style="margin:0 0 16px;color:#1B2B4B;font-size:16px;line-height:1.6;">
+                Because of what you just did, someone who has lost their job, their confidence, and maybe their hope — will find Hope After 50 free.
               </p>
-              <p style="margin:0 0 16px;color:#6B7A8D;font-size:16px;line-height:1.6;">
-                Your gift of ${amount} ${cadence} helps make sure the next person who needs HopeAfter50 finds it free, just like you did.
+              <p style="margin:0 0 16px;color:#1B2B4B;font-size:16px;line-height:1.6;">
+                They won't know your name. But what you did today will matter to them more than you know.
               </p>
-              <p style="margin:0;color:#6B7A8D;font-size:16px;line-height:1.6;">
-                It means more than you know. Thank you for standing with us.
+              <p style="margin:0 0 16px;color:#1B2B4B;font-size:16px;line-height:1.6;">
+                Your gift has been received and will go directly to keeping Hope After 50 free for everyone who needs it.
+              </p>
+              <p style="margin:0 0 16px;color:#1B2B4B;font-size:16px;line-height:1.6;">
+                If you gave monthly, you can cancel anytime by replying to this email.
+              </p>
+              <p style="margin:0;color:#1B2B4B;font-size:16px;line-height:1.6;">
+                Thank you.<br />— The Hope After 50 Team
               </p>
             </td>
           </tr>
           <tr>
             <td style="background:#E8EDE8;padding:20px 40px;">
               <p style="margin:0;color:#6B7A8D;font-size:12px;">
-                HopeAfter50 — Practical tools and renewed hope for experienced professionals rebuilding after career disruption.
+                This email serves as your donation receipt. Hope After 50 is operated by Bret Mundt. ${amount} given on ${date}.
               </p>
             </td>
           </tr>
