@@ -41,7 +41,7 @@ function describeDuration(since: Date, now: Date): string {
 }
 
 export function daysSinceJobLoss(since: Date, now: Date): number {
-  return Math.max(0, Math.floor((now.getTime() - since.getTime()) / 86_400_000))
+  return Math.max(1, Math.floor((now.getTime() - since.getTime()) / 86_400_000))
 }
 
 // Single source of truth for "how long has this member been on this journey":
