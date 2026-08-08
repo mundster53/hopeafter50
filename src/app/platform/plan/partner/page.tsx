@@ -33,8 +33,8 @@ function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Ti
     <div
       className={
         tier.featured
-          ? 'relative bg-navy border-2 border-amber-hope rounded-card p-6 shadow-lg shadow-amber-hope/20 scale-[1.03] transition'
-          : 'bg-navy border border-white/20 rounded-card p-6 hover:border-amber-hope transition'
+          ? 'relative flex flex-col bg-navy border-2 border-amber-hope rounded-card p-6 shadow-lg shadow-amber-hope/20 scale-[1.03] transition'
+          : 'flex flex-col bg-navy border border-white/20 rounded-card p-6 hover:border-amber-hope transition'
       }
     >
       {tier.featured && (
@@ -47,7 +47,7 @@ function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Ti
       <button
         onClick={() => onSelect(tier)}
         disabled={loading}
-        className="btn-primary inline-block disabled:opacity-50 disabled:cursor-not-allowed"
+        className="btn-primary inline-block disabled:opacity-50 disabled:cursor-not-allowed mt-auto"
       >
         {loading ? 'Redirecting…' : tier.cta}
       </button>
