@@ -95,7 +95,7 @@ Assessment incomplete
 
 Next Step:
 
-Complete your assessment.
+Take 5 minutes to tell us where you are — we'll take it from there.
 
 ---
 

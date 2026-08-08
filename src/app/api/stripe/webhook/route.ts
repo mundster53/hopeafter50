@@ -33,6 +33,12 @@ export async function POST(req: NextRequest) {
     const amount = checkoutSession.amount_total ?? 0
 
     if (email) {
+      let firstName = checkoutSession.customer_details?.name?.split(' ')[0]?.trim() ?? ''
+      if (!firstName && memberId) {
+        const member = await prisma.member.findUnique({ where: { id: memberId }, select: { firstName: true } })
+        firstName = member?.firstName ?? ''
+      }
+
       const partner = await prisma.partner.upsert({
         where: { stripeSessionId: checkoutSession.id },
         update: {},
@@ -48,14 +54,14 @@ export async function POST(req: NextRequest) {
         },
       })
 
-      await sendThankYouEmail(email, amount, checkoutSession.created, partner.id)
+      await sendThankYouEmail(email, firstName, amount, checkoutSession.created, partner.id)
     }
   }
 
   return NextResponse.json({ received: true })
 }
 
-async function sendThankYouEmail(email: string, amountCents: number, createdAt: number, partnerId: string) {
+async function sendThankYouEmail(email: string, firstName: string, amountCents: number, createdAt: number, partnerId: string) {
   const resend = new Resend(process.env.RESEND_API_KEY)
   const amount = (amountCents / 100).toLocaleString('en-US', { style: 'currency', currency: 'USD' })
   const date = new Date(createdAt * 1000).toLocaleDateString('en-US', {
@@ -80,7 +86,7 @@ async function sendThankYouEmail(email: string, amountCents: number, createdAt: 
         <table width="560" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(27,43,75,0.08);">
           <tr>
             <td style="padding:40px;">
-              <p style="margin:0 0 16px;color:#1B2B4B;font-size:16px;line-height:1.6;">Hi,</p>
+              <p style="margin:0 0 16px;color:#1B2B4B;font-size:16px;line-height:1.6;">${firstName ? `${firstName},` : 'Friend,'}</p>
               <p style="margin:0 0 16px;color:#1B2B4B;font-size:16px;line-height:1.6;">
                 Because of what you just did, someone who has lost their job, their confidence, and maybe their hope — will find Hope After 50 free.
               </p>

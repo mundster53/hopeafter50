@@ -129,7 +129,7 @@ function dailyEncouragementEmail(firstName: string, message: string): string {
           <tr>
             <td style="background:#E8EDE8;padding:20px 40px;">
               <p style="margin:0;color:#6B7A8D;font-size:12px;">
-                HopeAfter50 — Practical tools and renewed hope for experienced professionals rebuilding after career disruption.
+                HopeAfter50 — You are not alone, and you are not forgotten.
               </p>
             </td>
           </tr>

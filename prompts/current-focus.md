@@ -90,7 +90,7 @@ Assessment incomplete
 
 Current Focus:
 
-Complete your career assessment.
+Tell us where you are so we can build your plan.
 
 ---
 
