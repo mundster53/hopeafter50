@@ -4,6 +4,7 @@
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
+import { prisma } from '@/lib/db/client'
 
 const SUPPORT_INBOX = 'bretjmundt@gmail.com'
 
@@ -21,6 +22,12 @@ export async function POST(req: NextRequest) {
   }
 
   const fromAddress = `HopeAfter50 <${process.env.FROM_EMAIL ?? 'hello@hopeafter50.org'}>`
+
+  try {
+    await prisma.supportRequest.create({ data: { name, email, message } })
+  } catch (err) {
+    console.error('Failed to save support request:', err)
+  }
 
   try {
     const { error: teamError } = await getResend().emails.send({

@@ -67,76 +67,76 @@ model VerificationToken {
 // ============================================================
 
 model Member {
-  id                       String    @id @default(cuid())  // matches User.id
-  firstName                String
-  email                    String    @unique
-  user                     User      @relation(fields: [id], references: [id])
-  ageRange                 String?
-  gender                   String?
-  faithBasedEncouragement  Boolean   @default(false)
-  contactPreference        String    @default("self_serve")
-  createdAt                DateTime  @default(now())
-  updatedAt                DateTime  @updatedAt
+  id                      String   @id @default(cuid()) // matches User.id
+  firstName               String
+  email                   String   @unique
+  user                    User     @relation(fields: [id], references: [id])
+  ageRange                String?
+  gender                  String?
+  faithBasedEncouragement Boolean  @default(false)
+  contactPreference       String   @default("self_serve")
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
 
   // The member's original uploaded resume text, captured once on their
   // first upload and never overwritten. Optimized and tailored resumes
   // are always derived copies stored separately (ResumeAnalysis /
   // ResumeOptimization / ResumeTailoring) — this is the permanent source.
-  baseResumeText           String?   @db.Text
-  baseResumeFileUrl        String?
-  baseResumeSetAt          DateTime?
+  baseResumeText    String?   @db.Text
+  baseResumeFileUrl String?
+  baseResumeSetAt   DateTime?
 
-  assessment    Assessment?
-  rebuildPlan   RebuildPlan?
+  assessment     Assessment?
+  rebuildPlan    RebuildPlan?
   weeklyCheckIns WeeklyCheckIn[]
-  milestones    MemberMilestone[]
+  milestones     MemberMilestone[]
 
-  resumeAnalyses        ResumeAnalysis[]
-  resumeOptimizations   ResumeOptimization[]
-  resumeTailorings      ResumeTailoring[]
+  resumeAnalyses         ResumeAnalysis[]
+  resumeOptimizations    ResumeOptimization[]
+  resumeTailorings       ResumeTailoring[]
   opportunityEvaluations OpportunityEvaluation[]
-  coverLetters          CoverLetter[]
-  interviewPreps        InterviewPrep[]
-  linkedInOptimizations LinkedInOptimization[]
-  partnerDonations      Partner[]
-  dailyEncouragements   DailyEncouragement[]
+  coverLetters           CoverLetter[]
+  interviewPreps         InterviewPrep[]
+  linkedInOptimizations  LinkedInOptimization[]
+  partnerDonations       Partner[]
+  dailyEncouragements    DailyEncouragement[]
 }
 
 model Assessment {
-  id                  String   @id @default(cuid())
-  memberId            String   @unique
-  member              Member   @relation(fields: [memberId], references: [id])
-  completedAt         DateTime @default(now())
+  id          String   @id @default(cuid())
+  memberId    String   @unique
+  member      Member   @relation(fields: [memberId], references: [id])
+  completedAt DateTime @default(now())
 
-  situation           String
-  lastRole            String?
-  jobLossDate         DateTime?
-  rebuildDuration     String
-  primaryFear         String
-  clarityLevel        String
-  workInterests       String[] // stored as array
-  financialRunway     String
-  usingSavings        Boolean  @default(false)
-  interviewFrequency  String
-  hasCurrentResume    String
-  aiToolsNeeded       String[]
-  additionalContext   String?
-  successVision       String?
+  situation          String
+  lastRole           String?
+  jobLossDate        DateTime?
+  rebuildDuration    String
+  primaryFear        String
+  clarityLevel       String
+  workInterests      String[] // stored as array
+  financialRunway    String
+  usingSavings       Boolean   @default(false)
+  interviewFrequency String
+  hasCurrentResume   String
+  aiToolsNeeded      String[]
+  additionalContext  String?
+  successVision      String?
 }
 
 model RebuildPlan {
-  id                 String   @id @default(cuid())
-  memberId           String   @unique
-  member             Member   @relation(fields: [memberId], references: [id])
-  generatedAt        DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id          String   @id @default(cuid())
+  memberId    String   @unique
+  member      Member   @relation(fields: [memberId], references: [id])
+  generatedAt DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  financialUrgency   Int      // 1-5
+  financialUrgency   Int // 1-5
   currentStage       String
   careerDirections   String[]
-  topPriorities      Json     // Priority[]
+  topPriorities      Json // Priority[]
   recommendedToolIds String[]
-  todaysAction       Json     // TodayAction
+  todaysAction       Json // TodayAction
   strengths          String[]
   watchItems         String[]
   progressPercent    Int      @default(0)
@@ -146,34 +146,34 @@ model WeeklyCheckIn {
   id          String   @id @default(cuid())
   memberId    String
   member      Member   @relation(fields: [memberId], references: [id])
-  week        String   // ISO week string e.g. "2025-W12"
+  week        String // ISO week string e.g. "2025-W12"
   rating      String
   comment     String?
   submittedAt DateTime @default(now())
 
   // Structured Weekly Review inputs (prompts/weekly-review.md)
-  wins                     String? @db.Text
-  progressNotes            String? @db.Text
-  obstacles                String? @db.Text
-  applicationsSubmitted    Int     @default(0)
-  networkingConversations  Int     @default(0)
-  interviewsCompleted      Int     @default(0)
-  offersReceived           Int     @default(0)
-  newEmployment            Boolean @default(false)
+  wins                    String? @db.Text
+  progressNotes           String? @db.Text
+  obstacles               String? @db.Text
+  applicationsSubmitted   Int     @default(0)
+  networkingConversations Int     @default(0)
+  interviewsCompleted     Int     @default(0)
+  offersReceived          Int     @default(0)
+  newEmployment           Boolean @default(false)
 
   // Full AI response JSON (progress_rating, momentum, wins, top_obstacles,
   // current_focus, next_step, dashboard_updates, alerts, encouragement, ...)
-  aiResponse  Json?
+  aiResponse Json?
 
   @@unique([memberId, week])
 }
 
 model MemberMilestone {
-  id          String    @id @default(cuid())
+  id          String   @id @default(cuid())
   memberId    String
-  member      Member    @relation(fields: [memberId], references: [id])
+  member      Member   @relation(fields: [memberId], references: [id])
   milestoneId String
-  completedAt DateTime  @default(now())
+  completedAt DateTime @default(now())
 
   @@unique([memberId, milestoneId])
 }
@@ -188,26 +188,26 @@ model ResumeAnalysis {
   id               String   @id @default(cuid())
   memberId         String
   member           Member   @relation(fields: [memberId], references: [id])
-  resumeFileUrl    String?  // Vercel Blob URL of the uploaded file
+  resumeFileUrl    String? // Vercel Blob URL of the uploaded file
   resumeText       String   @db.Text
   targetRoles      String[]
   targetIndustries String[]
-  analysis         Json     // full prompts/resume-analysis.md output
+  analysis         Json // full prompts/resume-analysis.md output
   atsRating        String?
   overallRating    String?
   createdAt        DateTime @default(now())
 }
 
 model ResumeOptimization {
-  id                     String          @id @default(cuid())
-  memberId               String
-  member                 Member          @relation(fields: [memberId], references: [id])
-  resumeAnalysisId       String?
-  optimizedResumeMarkdown String         @db.Text
-  majorChanges           String[]
-  recommendedFollowUp    String[]
-  confidence             String?
-  createdAt              DateTime        @default(now())
+  id                      String   @id @default(cuid())
+  memberId                String
+  member                  Member   @relation(fields: [memberId], references: [id])
+  resumeAnalysisId        String?
+  optimizedResumeMarkdown String   @db.Text
+  majorChanges            String[]
+  recommendedFollowUp     String[]
+  confidence              String?
+  createdAt               DateTime @default(now())
 }
 
 model ResumeTailoring {
@@ -219,21 +219,21 @@ model ResumeTailoring {
   tailoredResumeMarkdown String   @db.Text
   matchScore             Int?
   matchLabel             String?
-  tailoring              Json     // full prompts/resume-tailoring.md output
+  tailoring              Json // full prompts/resume-tailoring.md output
   createdAt              DateTime @default(now())
 }
 
 model OpportunityEvaluation {
-  id              String   @id @default(cuid())
-  memberId        String
-  member          Member   @relation(fields: [memberId], references: [id])
-  jobTitle        String
-  company         String
-  jobDescription  String   @db.Text
-  evaluation      Json     // full prompts/opportunity-evaluation.md output
-  fitScore        Int?
-  recommendation  String?
-  createdAt       DateTime @default(now())
+  id             String   @id @default(cuid())
+  memberId       String
+  member         Member   @relation(fields: [memberId], references: [id])
+  jobTitle       String
+  company        String
+  jobDescription String   @db.Text
+  evaluation     Json // full prompts/opportunity-evaluation.md output
+  fitScore       Int?
+  recommendation String?
+  createdAt      DateTime @default(now())
 }
 
 model CoverLetter {
@@ -256,19 +256,19 @@ model InterviewPrep {
   member    Member   @relation(fields: [memberId], references: [id])
   jobTitle  String
   company   String
-  prep      Json     // full prompts/interview-prep.md output
+  prep      Json // full prompts/interview-prep.md output
   createdAt DateTime @default(now())
 }
 
 model LinkedInOptimization {
-  id          String   @id @default(cuid())
-  memberId    String
-  member      Member   @relation(fields: [memberId], references: [id])
-  headline    String?  @db.Text
-  about       String?  @db.Text
-  experience  String?  @db.Text
-  analysis    Json     // AI response, based on prompts/resume-analysis.md guidance
-  createdAt   DateTime @default(now())
+  id         String   @id @default(cuid())
+  memberId   String
+  member     Member   @relation(fields: [memberId], references: [id])
+  headline   String?  @db.Text
+  about      String?  @db.Text
+  experience String?  @db.Text
+  analysis   Json // AI response, based on prompts/resume-analysis.md guidance
+  createdAt  DateTime @default(now())
 }
 
 // ============================================================
@@ -280,12 +280,25 @@ model DailyEncouragement {
   id          String    @id @default(cuid())
   memberId    String
   member      Member    @relation(fields: [memberId], references: [id])
-  date        String    // "YYYY-MM-DD" in America/Chicago
+  date        String // "YYYY-MM-DD" in America/Chicago
   message     String    @db.Text
   emailSentAt DateTime?
   createdAt   DateTime  @default(now())
 
   @@unique([memberId, date])
+}
+
+// ============================================================
+// Support requests — submitted via the "Get Help" contact form
+// (src/app/api/support/route.ts), also emailed to the team
+// ============================================================
+
+model SupportRequest {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String   @db.Text
+  createdAt DateTime @default(now())
 }
 
 // ============================================================
@@ -298,8 +311,8 @@ model Partner {
   memberId         String?
   member           Member?  @relation(fields: [memberId], references: [id])
   email            String
-  amount           Int      // in cents
-  interval         String   // "monthly" | "one_time"
+  amount           Int // in cents
+  interval         String // "monthly" | "one_time"
   stripeCustomerId String?
   stripeSessionId  String   @unique
   status           String   @default("complete")
