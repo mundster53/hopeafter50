@@ -21,9 +21,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ success: false, error: 'Unauthorized' }, { status: 401 })
   }
 
+  const testEmail = req.nextUrl.searchParams.get('testEmail')
+
   const now = new Date()
   const date = chicagoDateString(now)
   const members = await prisma.member.findMany({
+    where: testEmail ? { email: testEmail } : undefined,
     select: {
       id: true,
       firstName: true,
@@ -39,7 +42,8 @@ export async function GET(req: NextRequest) {
   for (const member of members) {
     try {
       const encouragement = await getDailyEncouragement(member.id, now)
-      if (!encouragement || encouragement.emailSentAt) continue
+      if (!encouragement) continue
+      if (encouragement.emailSentAt && !testEmail) continue
 
       const days = daysSinceJobLoss(jobLossSinceFor(member), now)
 
