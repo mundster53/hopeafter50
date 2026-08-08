@@ -33,8 +33,8 @@ function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Ti
     <div
       className={
         tier.featured
-          ? 'relative flex flex-col bg-navy border-2 border-amber-hope rounded-card p-6 shadow-lg shadow-amber-hope/20 scale-[1.03] transition'
-          : 'flex flex-col bg-navy border border-white/20 rounded-card p-6 hover:border-amber-hope transition'
+          ? 'relative flex flex-col h-full bg-navy border-2 border-amber-hope rounded-card p-6 shadow-lg shadow-amber-hope/20 scale-[1.03] transition'
+          : 'flex flex-col h-full bg-navy border border-white/20 rounded-card p-6 hover:border-amber-hope transition'
       }
     >
       {tier.featured && (
@@ -115,7 +115,7 @@ export default function PartnerPage() {
         {/* Recurring */}
         <div className="space-y-4">
           <p className="font-body text-white/50 text-xs tracking-widest uppercase">Recurring Monthly</p>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-3 gap-4 items-stretch">
             {RECURRING_TIERS.map((tier) => (
               <TierCard
                 key={tier.amount}
@@ -132,7 +132,7 @@ export default function PartnerPage() {
         {/* One-time */}
         <div className="space-y-4">
           <p className="font-body text-white/50 text-xs tracking-widest uppercase">One-Time</p>
-          <div className="grid sm:grid-cols-3 gap-4">
+          <div className="grid sm:grid-cols-3 gap-4 items-stretch">
             {ONE_TIME_TIERS.map((tier) => (
               <TierCard
                 key={tier.amount}
