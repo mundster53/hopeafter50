@@ -6,7 +6,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 import { prisma } from '@/lib/db/client'
-import { getDailyEncouragement, chicagoDateString, daysSinceJobLoss } from '@/lib/ai/dailyEncouragement'
+import { getDailyEncouragement, chicagoDateString, daysSinceJobLoss, jobLossSinceFor } from '@/lib/ai/dailyEncouragement'
 
 function subjectFor(firstName: string, days: number): string {
   if (days < 30) return `Good morning, ${firstName} — you're just getting started.`
@@ -41,8 +41,7 @@ export async function GET(req: NextRequest) {
       const encouragement = await getDailyEncouragement(member.id, now)
       if (!encouragement || encouragement.emailSentAt) continue
 
-      const jobLossSince = member.assessment?.jobLossDate ?? member.assessment?.completedAt ?? member.createdAt
-      const days = daysSinceJobLoss(jobLossSince, now)
+      const days = daysSinceJobLoss(jobLossSinceFor(member), now)
 
       const { error } = await getResend().emails.send({
         from: `HopeAfter50 <${process.env.FROM_EMAIL ?? 'hello@hopeafter50.org'}>`,

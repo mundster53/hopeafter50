@@ -44,6 +44,16 @@ export function daysSinceJobLoss(since: Date, now: Date): number {
   return Math.max(0, Math.floor((now.getTime() - since.getTime()) / 86_400_000))
 }
 
+// Single source of truth for "how long has this member been on this journey":
+// prefer their stated job loss date, then their assessment completion date,
+// then the day they joined the platform.
+export function jobLossSinceFor(member: {
+  createdAt: Date
+  assessment?: { jobLossDate: Date | null; completedAt: Date } | null
+}): Date {
+  return member.assessment?.jobLossDate ?? member.assessment?.completedAt ?? member.createdAt
+}
+
 function emotionalStageFor(days: number): string {
   if (days <= 30) return 'shock_momentum'
   if (days <= 90) return 'doubt_setting_in'
@@ -70,8 +80,7 @@ export async function getDailyEncouragement(memberId: string, now: Date = new Da
   })
   if (!member) return null
 
-  const jobLossSince = member.assessment?.jobLossDate ?? member.assessment?.completedAt ?? member.createdAt
-  const days = daysSinceJobLoss(jobLossSince, now)
+  const days = daysSinceJobLoss(jobLossSinceFor(member), now)
 
   const message = (
     await runTextPrompt({

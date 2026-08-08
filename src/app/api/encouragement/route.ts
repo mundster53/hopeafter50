@@ -5,7 +5,8 @@
 import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { getDailyEncouragement, chicagoHour, greetingFor } from '@/lib/ai/dailyEncouragement'
+import { getDailyEncouragement, chicagoHour, greetingFor, daysSinceJobLoss, jobLossSinceFor } from '@/lib/ai/dailyEncouragement'
+import { prisma } from '@/lib/db/client'
 
 export async function GET() {
   const session = await getServerSession(authOptions)
@@ -20,12 +21,18 @@ export async function GET() {
       return NextResponse.json({ success: false, error: 'Member not found' }, { status: 404 })
     }
 
+    const member = await prisma.member.findUnique({
+      where: { id: session.user.id },
+      select: { createdAt: true, assessment: { select: { jobLossDate: true, completedAt: true } } },
+    })
+
     const hour = chicagoHour(now)
     return NextResponse.json({
       success: true,
       message: encouragement.message,
       greeting: greetingFor(hour),
       isLateNight: hour >= 0 && hour < 5,
+      days: member ? daysSinceJobLoss(jobLossSinceFor(member), now) : null,
     })
   } catch (err) {
     console.error('Daily Word API error:', err)

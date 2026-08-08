@@ -57,7 +57,9 @@ export default async function DashboardPage() {
         {/* Daily Word — a personal note before the day's task */}
         {dailyEncouragement && (
           <div className="bg-white/5 rounded-card p-6 mb-4">
-            <p className="font-body text-amber-hope text-xs tracking-widest uppercase mb-3">Your Daily Word</p>
+            <p className="font-body text-amber-hope text-xs tracking-widest uppercase mb-3">
+              Your Daily Word · Day {data.daysOnJourney}
+            </p>
             <p className="font-body text-white/70 text-sm mb-2">
               {greeting}{data.firstName ? `, ${data.firstName}` : ''}.
             </p>

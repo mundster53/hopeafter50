@@ -6,6 +6,7 @@
 
 import { prisma } from '@/lib/db/client'
 import { ALL_MILESTONES, Priority, RebuildPlan as RebuildPlanType, TodayAction } from '@/types'
+import { daysSinceJobLoss, jobLossSinceFor } from '@/lib/ai/dailyEncouragement'
 
 // Milestone ids that mark a given tool as "done" for dashboard checklists.
 const TOOL_COMPLETION_MILESTONES: Record<string, string> = {
@@ -51,6 +52,7 @@ export function buildDashboardViewModel(
   return {
     firstName: member.firstName,
     faithBased: member.faithBasedEncouragement,
+    daysOnJourney: daysSinceJobLoss(jobLossSinceFor(member), new Date()),
     currentStage: (plan?.currentStage ?? 'stabilize') as RebuildPlanType['currentStage'],
     progressPercent: plan?.progressPercent ?? 0,
     currentFocus: topPriorities[0]?.label ?? 'Tell Us Your Story',
