@@ -294,11 +294,13 @@ model DailyEncouragement {
 // ============================================================
 
 model SupportRequest {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  message   String   @db.Text
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  name       String
+  email      String
+  message    String    @db.Text
+  createdAt  DateTime  @default(now())
+  resolved   Boolean   @default(false)
+  resolvedAt DateTime?
 }
 
 // ============================================================

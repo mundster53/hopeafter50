@@ -7,8 +7,9 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db/client'
-
-const ADMIN_EMAIL = 'bretjmundt@gmail.com'
+import { ADMIN_EMAIL } from '@/lib/admin/auth'
+import { DeleteMemberButton } from '@/components/admin/DeleteMemberButton'
+import { ResolvedToggle } from '@/components/admin/ResolvedToggle'
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions)
@@ -16,26 +17,39 @@ export default async function AdminPage() {
     redirect('/')
   }
 
-  const [totalMembers, assessmentsCompleted, activePartners, monthlyRevenue, members, partners, supportRequests] =
-    await Promise.all([
-      prisma.member.count(),
-      prisma.assessment.count(),
-      prisma.partner.count({ where: { status: 'active' } }),
-      prisma.partner.aggregate({
-        where: { interval: 'monthly' },
-        _sum: { amount: true },
-      }),
-      prisma.member.findMany({
-        include: {
-          assessment: true,
-          partnerDonations: { orderBy: { createdAt: 'desc' }, take: 1 },
-          weeklyCheckIns: { orderBy: { submittedAt: 'desc' }, take: 1 },
-        },
-        orderBy: { createdAt: 'desc' },
-      }),
-      prisma.partner.findMany({ orderBy: { createdAt: 'desc' } }),
-      prisma.supportRequest.findMany({ orderBy: { createdAt: 'desc' } }),
-    ])
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+
+  const [
+    totalMembers,
+    assessmentsCompleted,
+    activePartners,
+    monthlyRevenue,
+    openSupportRequests,
+    members,
+    partners,
+    supportRequests,
+  ] = await Promise.all([
+    prisma.member.count(),
+    prisma.assessment.count(),
+    prisma.partner.count({ where: { status: 'active' } }),
+    prisma.partner.aggregate({ where: { interval: 'monthly' }, _sum: { amount: true } }),
+    prisma.supportRequest.count({ where: { resolved: false } }),
+    prisma.member.findMany({
+      include: {
+        assessment: { select: { id: true } },
+        partnerDonations: { orderBy: { createdAt: 'desc' }, take: 1 },
+        weeklyCheckIns: { orderBy: { submittedAt: 'desc' }, take: 1 },
+      },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.partner.findMany({ orderBy: { createdAt: 'desc' } }),
+    prisma.supportRequest.findMany({ orderBy: { createdAt: 'desc' } }),
+  ])
+
+  const activeLast7Days = members.filter((m) => {
+    const lastActive = m.weeklyCheckIns[0]?.submittedAt ?? m.updatedAt
+    return lastActive >= sevenDaysAgo
+  }).length
 
   const monthlyRevenueCents = monthlyRevenue._sum.amount ?? 0
 
@@ -43,7 +57,9 @@ export default async function AdminPage() {
     { label: 'Total Members', value: totalMembers.toLocaleString() },
     { label: 'Assessments Completed', value: assessmentsCompleted.toLocaleString() },
     { label: 'Active Partners', value: activePartners.toLocaleString() },
-    { label: 'Monthly Partner Revenue', value: formatCents(monthlyRevenueCents) },
+    { label: 'Monthly Revenue', value: formatCents(monthlyRevenueCents) },
+    { label: 'Open Support Requests', value: openSupportRequests.toLocaleString() },
+    { label: 'Active in Last 7 Days', value: activeLast7Days.toLocaleString() },
   ]
 
   return (
@@ -59,11 +75,11 @@ export default async function AdminPage() {
         </div>
 
         {/* Summary cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
           {cards.map((card) => (
-            <div key={card.label} className="bg-white/5 border border-white/10 rounded-card p-6">
-              <p className="font-body text-white/60 text-sm">{card.label}</p>
-              <p className="font-display text-3xl text-white mt-2">{card.value}</p>
+            <div key={card.label} className="bg-white/5 border border-white/10 rounded-card p-5">
+              <p className="font-body text-white/60 text-xs">{card.label}</p>
+              <p className="font-display text-2xl text-white mt-2">{card.value}</p>
             </div>
           ))}
         </div>
@@ -75,29 +91,55 @@ export default async function AdminPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-white/60 border-b border-white/10">
-                  <th className="px-4 py-3 font-body font-medium">Email</th>
-                  <th className="px-4 py-3 font-body font-medium">Joined</th>
-                  <th className="px-4 py-3 font-body font-medium">Assessment Complete</th>
+                  <th className="px-4 py-3 font-body font-medium">Name / Email</th>
+                  <th className="px-4 py-3 font-body font-medium">Days Since Joined</th>
+                  <th className="px-4 py-3 font-body font-medium">Assessment</th>
+                  <th className="px-4 py-3 font-body font-medium">Resume Uploaded</th>
                   <th className="px-4 py-3 font-body font-medium">Partner</th>
                   <th className="px-4 py-3 font-body font-medium">Last Active</th>
+                  <th className="px-4 py-3 font-body font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {members.map((member) => {
                   const lastActive = member.weeklyCheckIns[0]?.submittedAt ?? member.updatedAt
+                  const daysSinceJoined = Math.floor(
+                    (Date.now() - member.createdAt.getTime()) / (24 * 60 * 60 * 1000)
+                  )
                   return (
-                    <tr key={member.id} className="border-b border-white/5 last:border-0 text-white/80">
-                      <td className="px-4 py-3">{member.email}</td>
-                      <td className="px-4 py-3">{formatDate(member.createdAt)}</td>
-                      <td className="px-4 py-3">{member.assessment ? 'Yes' : 'No'}</td>
-                      <td className="px-4 py-3">{member.partnerDonations[0] ? 'Yes' : 'No'}</td>
-                      <td className="px-4 py-3">{formatDate(lastActive)}</td>
+                    <tr key={member.id} className="border-b border-white/5 last:border-0 text-white/80 hover:bg-white/5">
+                      <td className="px-4 py-3">
+                        <Link href={`/admin/members/${member.id}`} className="block hover:text-amber-light">
+                          <span className="block text-white">{member.firstName || 'Unnamed'}</span>
+                          <span className="block text-white/50 text-xs">{member.email}</span>
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link href={`/admin/members/${member.id}`} className="block">{daysSinceJoined}</Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link href={`/admin/members/${member.id}`} className="block">{member.assessment ? 'Yes' : 'No'}</Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link href={`/admin/members/${member.id}`} className="block">
+                          {member.baseResumeFileUrl || member.baseResumeText ? 'Yes' : 'No'}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link href={`/admin/members/${member.id}`} className="block">{member.partnerDonations[0] ? 'Yes' : 'No'}</Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <Link href={`/admin/members/${member.id}`} className="block">{formatDate(lastActive)}</Link>
+                      </td>
+                      <td className="px-4 py-3">
+                        <DeleteMemberButton memberId={member.id} />
+                      </td>
                     </tr>
                   )
                 })}
                 {members.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-6 text-center text-white/40">No members yet.</td>
+                    <td colSpan={7} className="px-4 py-6 text-center text-white/40">No members yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -150,6 +192,7 @@ export default async function AdminPage() {
                   <th className="px-4 py-3 font-body font-medium">Email</th>
                   <th className="px-4 py-3 font-body font-medium">Message</th>
                   <th className="px-4 py-3 font-body font-medium">Date</th>
+                  <th className="px-4 py-3 font-body font-medium">Resolved</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,13 +200,16 @@ export default async function AdminPage() {
                   <tr key={request.id} className="border-b border-white/5 last:border-0 text-white/80 align-top">
                     <td className="px-4 py-3 whitespace-nowrap">{request.name}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{request.email}</td>
-                    <td className="px-4 py-3 max-w-md">{request.message}</td>
+                    <td className="px-4 py-3 max-w-md">{truncate(request.message, 120)}</td>
                     <td className="px-4 py-3 whitespace-nowrap">{formatDate(request.createdAt)}</td>
+                    <td className="px-4 py-3">
+                      <ResolvedToggle id={request.id} resolved={request.resolved} />
+                    </td>
                   </tr>
                 ))}
                 {supportRequests.length === 0 && (
                   <tr>
-                    <td colSpan={4} className="px-4 py-6 text-center text-white/40">No support requests yet.</td>
+                    <td colSpan={5} className="px-4 py-6 text-center text-white/40">No support requests yet.</td>
                   </tr>
                 )}
               </tbody>
@@ -181,4 +227,8 @@ function formatCents(cents: number): string {
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })
+}
+
+function truncate(text: string, max: number): string {
+  return text.length > max ? `${text.slice(0, max)}…` : text
 }
