@@ -5,8 +5,9 @@
 // ============================================================
 
 import { prisma } from '@/lib/db/client'
-import { ALL_MILESTONES, Priority, RebuildPlan as RebuildPlanType, TodayAction } from '@/types'
+import { ALL_MILESTONES, Priority, RebuildPlan as RebuildPlanType } from '@/types'
 import { daysSinceJobLoss, jobLossSinceFor } from '@/lib/ai/dailyEncouragement'
+import { getNextAction } from '@/lib/db/getNextAction'
 
 // Milestone ids that mark a given tool as "done" for dashboard checklists.
 const TOOL_COMPLETION_MILESTONES: Record<string, string> = {
@@ -22,6 +23,7 @@ export async function getMemberForSession(memberId: string) {
       rebuildPlan: true,
       milestones: { orderBy: { completedAt: 'desc' } },
       weeklyCheckIns: { orderBy: { submittedAt: 'desc' }, take: 1 },
+      resumeTailorings: { take: 1 },
     },
   })
 }
@@ -38,7 +40,8 @@ export function buildDashboardViewModel(
     .slice(0, 3)
     .map((m) => ALL_MILESTONES.find((all) => all.id === m.milestoneId)?.label ?? m.milestoneId)
 
-  const todaysAction = (plan?.todaysAction as unknown as TodayAction | null) ?? null
+  const hasResumeTailoring = member.resumeTailorings.length > 0
+  const nextAction = getNextAction(completedMilestoneIds, hasResumeTailoring)
   const topPriorities = (plan?.topPriorities as unknown as Priority[] | null) ?? []
   const recommendedToolIds = (plan?.recommendedToolIds ?? []) as string[]
 
@@ -56,12 +59,7 @@ export function buildDashboardViewModel(
     currentStage: (plan?.currentStage ?? 'stabilize') as RebuildPlanType['currentStage'],
     progressPercent: plan?.progressPercent ?? 0,
     currentFocus: topPriorities[0]?.label ?? 'Tell Us Your Story',
-    nextAction: todaysAction ?? {
-      title: 'Tell Us Your Story',
-      description: 'Tell us about your situation so we can build your Rebuild Plan.',
-      estimatedMinutes: 10,
-      url: '/platform/assessment',
-    },
+    nextAction,
     financialRunway: member.assessment
       ? FINANCIAL_RUNWAY_LABELS[member.assessment.financialRunway] ?? 'Unknown'
       : 'Unknown',
