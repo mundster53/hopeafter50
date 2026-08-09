@@ -9,6 +9,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db/client'
 import { ADMIN_EMAIL } from '@/lib/admin/auth'
 import { DeleteMemberButton } from '@/components/admin/DeleteMemberButton'
+import { DeletePartnerButton } from '@/components/admin/DeletePartnerButton'
 import { ResolvedToggle } from '@/components/admin/ResolvedToggle'
 
 export default async function AdminPage() {
@@ -159,6 +160,7 @@ export default async function AdminPage() {
                   <th className="px-4 py-3 font-body font-medium">Type</th>
                   <th className="px-4 py-3 font-body font-medium">Date</th>
                   <th className="px-4 py-3 font-body font-medium">Status</th>
+                  <th className="px-4 py-3 font-body font-medium">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -184,11 +186,14 @@ export default async function AdminPage() {
                     <td className="px-4 py-3 capitalize">
                       <Link href={`/admin/partners/${partner.id}`} className="block">{partner.status}</Link>
                     </td>
+                    <td className="px-4 py-3">
+                      <DeletePartnerButton partnerId={partner.id} />
+                    </td>
                   </tr>
                 ))}
                 {partners.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-6 text-center text-white/40">No partners yet.</td>
+                    <td colSpan={6} className="px-4 py-6 text-center text-white/40">No partners yet.</td>
                   </tr>
                 )}
               </tbody>
