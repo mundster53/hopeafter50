@@ -12,7 +12,7 @@ import { getMemberForSession, buildDashboardViewModel } from '@/lib/db/queries'
 import { TOOLS } from '@/lib/tools'
 import { STAGE_LABELS } from '@/lib/rebuild-engine'
 import { ToolId } from '@/types'
-import SignOutButton from '@/components/platform/SignOutButton'
+import PlatformNav from '@/components/platform/PlatformNav'
 import { getDailyEncouragement, chicagoHour, greetingFor } from '@/lib/ai/dailyEncouragement'
 
 export default async function DashboardPage() {
@@ -36,16 +36,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-navy">
-      {/* Platform Nav */}
-      <nav className="bg-navy border-b border-white/10 px-6 py-4 flex items-center justify-between">
-        <Link href="/" className="font-display text-white font-bold text-lg">Hope After 50</Link>
-        <div className="flex items-center gap-6">
-          <Link href="/platform/tools" className="font-body text-white/70 hover:text-white text-sm transition-colors">Tools</Link>
-          <Link href="/resources" className="font-body text-white/70 hover:text-white text-sm transition-colors">Resources</Link>
-          <Link href="/platform/support" className="font-body text-white/70 hover:text-white text-sm transition-colors">Get Help</Link>
-          <SignOutButton />
-        </div>
-      </nav>
+      <PlatformNav />
 
       <div className="max-wide mx-auto px-6 py-8">
 

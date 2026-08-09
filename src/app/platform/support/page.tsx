@@ -8,6 +8,7 @@ import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
 import { getMemberForSession } from '@/lib/db/queries'
 import SupportForm from '@/components/platform/SupportForm'
+import PlatformNav from '@/components/platform/PlatformNav'
 
 export default async function SupportPage() {
   const session = await getServerSession(authOptions)
@@ -22,10 +23,7 @@ export default async function SupportPage() {
 
   return (
     <div className="min-h-screen bg-navy">
-      <div className="bg-navy py-4 px-6 flex items-center justify-between border-b border-white/10">
-        <Link href="/platform/dashboard" className="font-display text-white font-bold">HopeAfter50</Link>
-        <Link href="/platform/dashboard" className="font-body text-white/70 hover:text-white text-sm">← Dashboard</Link>
-      </div>
+      <PlatformNav />
 
       <div className="max-w-2xl mx-auto px-6 py-16 space-y-8">
 

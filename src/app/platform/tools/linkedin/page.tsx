@@ -7,6 +7,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import PlatformNav from '@/components/platform/PlatformNav'
 import RatingBadge from '@/components/platform/RatingBadge'
 import { ResumeAnalysisResult } from '@/types/ai'
 
@@ -58,9 +59,10 @@ export default function LinkedInToolPage() {
 
   return (
     <div className="min-h-screen bg-warm-white">
-      <div className="bg-navy py-4 px-6 flex items-center justify-between">
-        <Link href="/platform/dashboard" className="font-display text-white font-bold">HopeAfter50 — LinkedIn Optimizer</Link>
-        <Link href="/platform/dashboard" className="font-body text-white/70 hover:text-white text-sm">← Dashboard</Link>
+      <PlatformNav />
+
+      <div className="max-wide mx-auto px-6 pt-8">
+        <p className="font-display text-navy text-lg font-semibold">LinkedIn Optimizer</p>
       </div>
 
       <div className="max-content mx-auto px-6 py-12">

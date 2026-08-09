@@ -6,6 +6,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import PlatformNav from '@/components/platform/PlatformNav'
 import MarkdownView from '@/components/platform/MarkdownView'
 import RatingBadge from '@/components/platform/RatingBadge'
 import { CoverLetterResult } from '@/types/ai'
@@ -55,9 +56,10 @@ export default function CoverLetterPage() {
 
   return (
     <div className="min-h-screen bg-warm-white">
-      <div className="bg-navy py-4 px-6 flex items-center justify-between">
-        <Link href="/platform/dashboard" className="font-display text-white font-bold">HopeAfter50 — Cover Letter Builder</Link>
-        <Link href="/platform/dashboard" className="font-body text-white/70 hover:text-white text-sm">← Dashboard</Link>
+      <PlatformNav />
+
+      <div className="max-wide mx-auto px-6 pt-8">
+        <p className="font-display text-navy text-lg font-semibold">Cover Letter Builder</p>
       </div>
 
       <div className="max-content mx-auto px-6 py-12">

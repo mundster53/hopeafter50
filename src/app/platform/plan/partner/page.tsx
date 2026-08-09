@@ -6,6 +6,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import PlatformNav from '@/components/platform/PlatformNav'
 
 type Tier = {
   amount: string
@@ -86,6 +87,7 @@ export default function PartnerPage() {
 
   return (
     <div className="min-h-screen bg-navy">
+      <PlatformNav />
       <div className="max-w-2xl mx-auto px-6 py-16 space-y-10">
 
         {/* Eyebrow */}

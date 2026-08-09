@@ -2,10 +2,12 @@
 // Supports tabs: strategy | runway
 // Ref: Artifact 4 (Financial Runway), Artifact 5 (career direction logic)
 // Financial Runway: monthly expenses, savings, severance, health insurance timeline
+import PlatformNav from '@/components/platform/PlatformNav'
+
 export default function IncomeStrategyPage() {
   return (
     <div className="min-h-screen bg-warm-white">
-      <div className="bg-navy py-4 px-6"><p className="font-display text-white font-bold">HopeAfter50 — Income Strategy</p></div>
+      <PlatformNav />
       <div className="max-content mx-auto px-6 py-12">
         <h1 className="font-display text-display-md text-navy mb-4">Income Strategy Planner</h1>
         <p className="font-body text-slate-supporting text-lg mb-8">Identify your fastest path to income and calculate your financial runway.</p>

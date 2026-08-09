@@ -5,14 +5,12 @@
 // ============================================================
 import Link from 'next/link'
 import { TOOLS } from '@/lib/tools'
+import PlatformNav from '@/components/platform/PlatformNav'
 
 export default function AllToolsPage() {
   return (
     <div className="min-h-screen bg-warm-white">
-      <div className="bg-navy py-4 px-6 flex items-center justify-between">
-        <Link href="/platform/dashboard" className="font-display text-white font-bold">HopeAfter50</Link>
-        <Link href="/platform/dashboard" className="font-body text-white/70 hover:text-white text-sm">← Dashboard</Link>
-      </div>
+      <PlatformNav />
 
       <div className="max-wide mx-auto px-6 py-12">
         <p className="font-body text-slate-supporting text-sm tracking-widest uppercase mb-4">All Tools</p>

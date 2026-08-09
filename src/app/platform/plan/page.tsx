@@ -7,6 +7,7 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { RebuildPlan } from '@/types'
+import PlatformNav from '@/components/platform/PlatformNav'
 
 export default function PlanPage() {
   const [plan, setPlan] = useState<RebuildPlan | null>(null)
@@ -29,6 +30,7 @@ export default function PlanPage() {
 
   return (
     <div className="min-h-screen bg-navy">
+      <PlatformNav />
       <div className="max-w-2xl mx-auto px-6 py-16 space-y-8">
 
         <div>
