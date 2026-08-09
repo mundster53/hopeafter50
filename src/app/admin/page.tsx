@@ -11,6 +11,7 @@ import { ADMIN_EMAIL } from '@/lib/admin/auth'
 import { DeleteMemberButton } from '@/components/admin/DeleteMemberButton'
 import { DeletePartnerButton } from '@/components/admin/DeletePartnerButton'
 import { ResolvedToggle } from '@/components/admin/ResolvedToggle'
+import { BroadcastForm } from '@/components/admin/BroadcastForm'
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions)
@@ -234,6 +235,30 @@ export default async function AdminPage() {
                 )}
               </tbody>
             </table>
+          </div>
+        </section>
+
+        {/* Message all members */}
+        <section>
+          <h2 className="font-display text-lg text-white mb-3">Message All Members</h2>
+          <div className="bg-white/5 border border-white/10 rounded-card p-5">
+            <BroadcastForm
+              endpoint="/api/admin/broadcast/members"
+              buttonLabel="Send to All Members"
+              recipientLabel="members"
+            />
+          </div>
+        </section>
+
+        {/* Message all partners */}
+        <section>
+          <h2 className="font-display text-lg text-white mb-3">Message All Partners</h2>
+          <div className="bg-white/5 border border-white/10 rounded-card p-5">
+            <BroadcastForm
+              endpoint="/api/admin/broadcast/partners"
+              buttonLabel="Send to All Partners"
+              recipientLabel="partners"
+            />
           </div>
         </section>
       </div>
