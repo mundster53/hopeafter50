@@ -36,7 +36,7 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { priceId, mode, email } = body ?? {}
+    const { priceId, mode, email, organizationName } = body ?? {}
 
     if (typeof priceId !== 'string' || !priceId) {
       return NextResponse.json({ success: false, error: 'A valid priceId is required.' }, { status: 400 })
@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         memberId: session?.user?.id ?? '',
         mode,
+        organizationName: typeof organizationName === 'string' ? organizationName.trim().slice(0, 200) : '',
       },
       success_url: SUCCESS_URL,
       cancel_url: CANCEL_URL,

@@ -313,6 +313,7 @@ model Partner {
   memberId         String?
   member           Member?  @relation(fields: [memberId], references: [id])
   email            String
+  organizationName String?
   amount           Int // in cents
   interval         String // "monthly" | "one_time"
   stripeCustomerId String?

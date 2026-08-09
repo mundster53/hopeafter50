@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
     const memberId = checkoutSession.metadata?.memberId || null
     const interval = checkoutSession.metadata?.mode === 'subscription' ? 'monthly' : 'one_time'
     const amount = checkoutSession.amount_total ?? 0
+    const organizationName = checkoutSession.metadata?.organizationName || null
 
     if (email) {
       let firstName = checkoutSession.customer_details?.name?.split(' ')[0]?.trim() ?? ''
@@ -45,6 +46,7 @@ export async function POST(req: NextRequest) {
         create: {
           memberId,
           email,
+          organizationName,
           amount,
           interval,
           stripeCustomerId:

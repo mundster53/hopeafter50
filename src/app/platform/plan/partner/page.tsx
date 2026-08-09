@@ -58,6 +58,7 @@ function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Ti
 export default function PartnerPage() {
   const [pendingPriceId, setPendingPriceId] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [organizationName, setOrganizationName] = useState('')
 
   async function handleSelect(tier: Tier) {
     setError(null)
@@ -67,7 +68,7 @@ export default function PartnerPage() {
       const res = await fetch('/api/stripe/create-checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ priceId: tier.priceId, mode: tier.mode }),
+        body: JSON.stringify({ priceId: tier.priceId, mode: tier.mode, organizationName: organizationName.trim() || undefined }),
       })
       const data = await res.json()
 
@@ -111,6 +112,21 @@ export default function PartnerPage() {
         {error && (
           <p className="font-body text-red-400 text-sm text-center">{error}</p>
         )}
+
+        {/* Organization name */}
+        <div className="space-y-2">
+          <label className="font-body text-white/50 text-xs tracking-widest uppercase" htmlFor="organizationName">
+            Organization name (optional)
+          </label>
+          <input
+            id="organizationName"
+            type="text"
+            value={organizationName}
+            onChange={(e) => setOrganizationName(e.target.value)}
+            placeholder="Church, company, or organization name (optional)"
+            className="w-full bg-navy border border-white/20 rounded px-3 py-2 text-white font-body text-sm focus:outline-none focus:border-amber-hope"
+          />
+        </div>
 
         {/* Recurring */}
         <div className="space-y-4">

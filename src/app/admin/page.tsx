@@ -163,12 +163,27 @@ export default async function AdminPage() {
               </thead>
               <tbody>
                 {partners.map((partner) => (
-                  <tr key={partner.id} className="border-b border-white/5 last:border-0 text-white/80">
-                    <td className="px-4 py-3">{partner.email}</td>
-                    <td className="px-4 py-3">{formatCents(partner.amount)}</td>
-                    <td className="px-4 py-3">{partner.interval === 'monthly' ? 'Monthly' : 'One-Time'}</td>
-                    <td className="px-4 py-3">{formatDate(partner.createdAt)}</td>
-                    <td className="px-4 py-3 capitalize">{partner.status}</td>
+                  <tr key={partner.id} className="border-b border-white/5 last:border-0 text-white/80 hover:bg-white/5">
+                    <td className="px-4 py-3">
+                      <Link href={`/admin/partners/${partner.id}`} className="block hover:text-amber-light">
+                        <span className="block text-white">{partner.email}</span>
+                        {partner.organizationName && (
+                          <span className="block text-white/50 text-xs">{partner.organizationName}</span>
+                        )}
+                      </Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link href={`/admin/partners/${partner.id}`} className="block">{formatCents(partner.amount)}</Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link href={`/admin/partners/${partner.id}`} className="block">{partner.interval === 'monthly' ? 'Monthly' : 'One-Time'}</Link>
+                    </td>
+                    <td className="px-4 py-3">
+                      <Link href={`/admin/partners/${partner.id}`} className="block">{formatDate(partner.createdAt)}</Link>
+                    </td>
+                    <td className="px-4 py-3 capitalize">
+                      <Link href={`/admin/partners/${partner.id}`} className="block">{partner.status}</Link>
+                    </td>
                   </tr>
                 ))}
                 {partners.length === 0 && (
