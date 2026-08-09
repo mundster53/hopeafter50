@@ -26,11 +26,27 @@ export default async function PlanPage() {
     redirect('/auth/signin')
   }
 
+  const firstName = member.firstName || 'Friend'
+
   if (!member.rebuildPlan) {
-    redirect('/platform/assessment')
+    return (
+      <div className="min-h-screen bg-navy">
+        <PlatformNav />
+        <div className="max-w-2xl mx-auto px-6 py-16 space-y-8">
+          <div>
+            <h1 className="font-display text-display-md text-white mb-6">Your plan is waiting.</h1>
+            <p className="font-body text-white/80">
+              Once you finish telling us your story, we'll build a plan specifically for you. It takes about 5 minutes.
+            </p>
+          </div>
+          <Link href="/platform/assessment" className="btn-primary inline-block">
+            Tell us your story
+          </Link>
+        </div>
+      </div>
+    )
   }
 
-  const firstName = member.firstName || 'Friend'
   const todaysAction = member.rebuildPlan.todaysAction as unknown as TodayAction
 
   return (
