@@ -37,10 +37,7 @@ export default function AssessmentPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(answers),
       })
-      const data = await res.json()
-      // Store plan ID in sessionStorage for the plan page to pick up
-      sessionStorage.setItem('rebuildPlan', JSON.stringify(data.plan))
-      sessionStorage.setItem('memberName', answers.firstName || 'Friend')
+      await res.json()
       router.push('/platform/plan')
     } catch (err) {
       console.error(err)

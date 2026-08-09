@@ -1,32 +1,37 @@
 // ============================================================
 // HopeAfter50 — Personalized Rebuild Plan
-// Artifact 3 — displayed immediately after assessment
+// Artifact 3 — displayed immediately after assessment, and any
+// time a member revisits their plan from the nav.
+//
+// Reads the plan from the database (not sessionStorage) so the
+// page works on direct navigation, refresh, or from a new device
+// — not just right after submitting the assessment.
 // ============================================================
-'use client'
-
-import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { RebuildPlan } from '@/types'
+import { getServerSession } from 'next-auth'
+import { redirect } from 'next/navigation'
+import { authOptions } from '@/lib/auth'
+import { getMemberForSession } from '@/lib/db/queries'
+import { TodayAction } from '@/types'
 import PlatformNav from '@/components/platform/PlatformNav'
 
-export default function PlanPage() {
-  const [plan, setPlan] = useState<RebuildPlan | null>(null)
-  const [firstName, setFirstName] = useState('Friend')
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem('rebuildPlan')
-    const storedName = sessionStorage.getItem('memberName')
-    if (stored) setPlan(JSON.parse(stored))
-    if (storedName) setFirstName(storedName.split(' ')[0])
-  }, [])
-
-  if (!plan) {
-    return (
-      <div className="min-h-screen bg-navy flex items-center justify-center">
-        <p className="font-body text-white/70">Loading your plan...</p>
-      </div>
-    )
+export default async function PlanPage() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user?.id) {
+    redirect('/auth/signin')
   }
+
+  const member = await getMemberForSession(session.user.id)
+  if (!member) {
+    redirect('/auth/signin')
+  }
+
+  if (!member.rebuildPlan) {
+    redirect('/platform/assessment')
+  }
+
+  const firstName = member.firstName || 'Friend'
+  const todaysAction = member.rebuildPlan.todaysAction as unknown as TodayAction
 
   return (
     <div className="min-h-screen bg-navy">
@@ -51,14 +56,14 @@ export default function PlanPage() {
 
         <div className="bg-white/5 rounded-card p-8">
           <p className="font-body text-amber-hope text-xs tracking-widest uppercase mb-3">Your One Step for Today</p>
-          <h2 className="font-display text-2xl text-white mb-3">{plan.todaysAction.title}</h2>
-          <p className="font-body text-white/80 mb-6">{plan.todaysAction.description}</p>
-          {plan.todaysAction.url && (
-            <Link href={plan.todaysAction.url} className="btn-primary inline-block">
+          <h2 className="font-display text-2xl text-white mb-3">{todaysAction.title}</h2>
+          <p className="font-body text-white/80 mb-6">{todaysAction.description}</p>
+          {todaysAction.url && (
+            <Link href={todaysAction.url} className="btn-primary inline-block">
               I'm ready — let's do this
             </Link>
           )}
-          <p className="font-body text-white/50 text-sm mt-3">Estimated time: {plan.todaysAction.estimatedMinutes} minutes</p>
+          <p className="font-body text-white/50 text-sm mt-3">Estimated time: {todaysAction.estimatedMinutes} minutes</p>
         </div>
 
         <div className="border-t border-white/10" />
