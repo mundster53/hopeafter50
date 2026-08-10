@@ -1,71 +1,71 @@
 // ============================================================
 // HopeAfter50 — LinkedIn Optimizer API
-// Fetches a member's public LinkedIn profile HTML and has Claude
-// give warm, human, actionable feedback on it.
+// No dedicated prompt file exists for LinkedIn — per instruction,
+// this reuses prompts/resume-analysis.md's evaluation guidance,
+// framing the member's LinkedIn sections as the "resume_text" input.
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import Anthropic from '@anthropic-ai/sdk'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db/client'
-
-// Locked per project constraint — do not change without explicit instruction.
-const MODEL = 'claude-sonnet-4-6'
-
-const SYSTEM_PROMPT = `You are a career advisor helping a job seeker over 50 strengthen their LinkedIn presence. You will receive raw HTML from a public LinkedIn profile page. Extract what you can about their headline, about/summary section, most recent job title and company, and skills. Then provide warm, specific, actionable suggestions to improve each section. Write like a trusted friend who knows this world, not a coach or a platform. Do not use the words optimize, leverage, or assessment. Focus on making their profile feel human and credible, not keyword-stuffed.`
-
-const TROUBLE_MESSAGE = "We had trouble reading that profile. Make sure it's set to public and try again."
+import { runStructuredPrompt } from '@/lib/ai/anthropic'
+import { getMemberAiContext } from '@/lib/ai/context'
+import { ResumeAnalysisResult } from '@/types/ai'
 
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
-    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
+    return NextResponse.json({ success: false, error: 'Not authenticated' }, { status: 401 })
   }
   const memberId = session.user.id
 
   try {
-    const { profileUrl } = await req.json()
+    const body = await req.json()
+    const {
+      headline = '',
+      about = '',
+      experience = '',
+      targetRoles = [],
+      targetIndustries = [],
+    } = body
 
-    if (!profileUrl || typeof profileUrl !== 'string' || !profileUrl.trim()) {
-      return NextResponse.json({ error: 'Please paste your LinkedIn profile URL.' }, { status: 400 })
-    }
-
-    let html: string
-    try {
-      const profileRes = await fetch(profileUrl.trim(), {
-        headers: { 'User-Agent': 'Mozilla/5.0' },
-      })
-      if (!profileRes.ok) throw new Error(`Fetch failed with status ${profileRes.status}`)
-      html = await profileRes.text()
-    } catch (err) {
-      console.error('LinkedIn profile fetch error:', err)
-      return NextResponse.json({ error: TROUBLE_MESSAGE }, { status: 502 })
-    }
-
-    let analysis: string
-    try {
-      const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-      const response = await client.messages.create({
-        model: MODEL,
-        max_tokens: 4096,
-        system: SYSTEM_PROMPT,
-        messages: [{ role: 'user', content: html }],
-      })
-      const textBlock = response.content.find(
-        (block): block is Anthropic.TextBlock => block.type === 'text'
+    if (!headline.trim() && !about.trim() && !experience.trim()) {
+      return NextResponse.json(
+        { success: false, error: 'Paste at least one section of your LinkedIn profile.' },
+        { status: 400 }
       )
-      if (!textBlock) throw new Error('No text content returned from Anthropic')
-      analysis = textBlock.text
-    } catch (err) {
-      console.error('LinkedIn Optimizer AI error:', err)
-      return NextResponse.json({ error: TROUBLE_MESSAGE }, { status: 502 })
     }
 
-    await prisma.linkedInOptimization.create({
+    const profileText = [
+      headline.trim() && `LinkedIn Headline:\n${headline.trim()}`,
+      about.trim() && `LinkedIn About:\n${about.trim()}`,
+      experience.trim() && `LinkedIn Experience:\n${experience.trim()}`,
+    ]
+      .filter(Boolean)
+      .join('\n\n')
+
+    const { member, assessment_analysis } = await getMemberAiContext(memberId)
+
+    const analysis = await runStructuredPrompt<ResumeAnalysisResult>({
+      promptFile: 'resume-analysis.md',
+      input: {
+        member,
+        resume_text: profileText,
+        target_roles: targetRoles,
+        target_industries: targetIndustries,
+        career_preferences: {},
+        assessment_analysis,
+      },
+      maxTokens: 4096,
+    })
+
+    const saved = await prisma.linkedInOptimization.create({
       data: {
         memberId,
-        headline: profileUrl.trim(),
-        analysis: { text: analysis },
+        headline: headline || null,
+        about: about || null,
+        experience: experience || null,
+        analysis: analysis as any,
       },
     })
 
@@ -75,10 +75,13 @@ export async function POST(req: NextRequest) {
       update: {},
     })
 
-    return NextResponse.json({ analysis })
+    return NextResponse.json({ success: true, linkedInOptimizationId: saved.id, analysis })
   } catch (err) {
     console.error('LinkedIn Optimizer API error:', err)
-    return NextResponse.json({ error: TROUBLE_MESSAGE }, { status: 500 })
+    return NextResponse.json(
+      { success: false, error: 'Something went wrong analyzing your profile. Please try again.' },
+      { status: 500 }
+    )
   }
 }
 
