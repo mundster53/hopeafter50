@@ -14,6 +14,7 @@ import { STAGE_LABELS } from '@/lib/rebuild-engine'
 import { ToolId } from '@/types'
 import PlatformNav from '@/components/platform/PlatformNav'
 import { getDailyEncouragement, chicagoHour, greetingFor } from '@/lib/ai/dailyEncouragement'
+import { ADMIN_EMAIL } from '@/lib/admin/auth'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -39,8 +40,6 @@ export default async function DashboardPage() {
       <PlatformNav />
 
       <div className="max-wide mx-auto px-6 py-8">
-
-        <a href="/admin">Admin</a>
 
         {/* Greeting */}
         <div className="mb-8">
@@ -255,6 +254,9 @@ export default async function DashboardPage() {
           <Link href="/schedule" className="font-body text-white/70 hover:text-white">Schedule a Conversation</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white">Resources</Link>
           <Link href="/privacy-policy" className="font-body text-white/70 hover:text-white">Privacy</Link>
+          {session.user.email === ADMIN_EMAIL && (
+            <Link href="/admin" className="font-body text-white/40 hover:text-white/70 ml-auto">Admin</Link>
+          )}
         </div>
 
       </div>
