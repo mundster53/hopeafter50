@@ -253,6 +253,9 @@ export default async function DashboardPage() {
           <Link href="/schedule" className="font-body text-white/70 hover:text-white">Schedule a Conversation</Link>
           <Link href="/resources" className="font-body text-white/70 hover:text-white">Resources</Link>
           <Link href="/privacy-policy" className="font-body text-white/70 hover:text-white">Privacy</Link>
+          {session.user.email === 'bretjmundt@gmail.com' && (
+            <Link href="/admin" className="font-body text-white/40 hover:text-white/70 ml-auto">Admin</Link>
+          )}
         </div>
 
       </div>
