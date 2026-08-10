@@ -300,12 +300,12 @@ export default function ResumeToolPage() {
           <form onSubmit={handleSubmit} className="card space-y-6">
             <div className="border-2 border-dashed border-sage rounded-card text-center py-12 px-6">
               <p className="font-display text-xl text-navy mb-2">Upload Your Résumé</p>
-              <p className="font-body text-slate-supporting mb-6">PDF, DOCX, or plain text</p>
+              <p className="font-body text-slate-supporting mb-6">PDF, DOC, DOCX, or plain text</p>
               <label className="btn-primary cursor-pointer inline-block">
                 {file ? file.name : 'Choose File'}
                 <input
                   type="file"
-                  accept=".pdf,.docx,.txt,.md,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
+                  accept=".pdf,.doc,.docx,.txt,.md,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,text/plain"
                   className="hidden"
                   onChange={(e) => setFile(e.target.files?.[0] ?? null)}
                 />

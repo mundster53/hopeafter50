@@ -1,8 +1,11 @@
 // ============================================================
 // HopeAfter50 — Resume Text Extraction
-// Supports PDF, DOCX, and plain text uploads.
+// Supports PDF, DOC, DOCX, and plain text uploads.
 // ============================================================
 import mammoth from 'mammoth'
+// word-extractor ships no TypeScript types (and no @types package exists),
+// so it's required rather than imported, same as pdf-parse below.
+const WordExtractor = require('word-extractor')
 
 export async function extractResumeText(file: File): Promise<string> {
   const buffer = Buffer.from(await file.arrayBuffer())
@@ -46,9 +49,14 @@ export async function extractResumeText(file: File): Promise<string> {
     return result.value.trim()
   }
 
+  if (type === 'application/msword' || name.endsWith('.doc')) {
+    const doc = await new WordExtractor().extract(buffer)
+    return doc.getBody().trim()
+  }
+
   if (type === 'text/plain' || name.endsWith('.txt') || name.endsWith('.md')) {
     return buffer.toString('utf-8').trim()
   }
 
-  throw new Error('Unsupported file type. Please upload a PDF, DOCX, or plain text resume.')
+  throw new Error('Unsupported file type. Please upload a PDF, DOC, DOCX, or plain text resume.')
 }

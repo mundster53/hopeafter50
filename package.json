@@ -33,6 +33,7 @@
     "sonner": "^1.4.3",
     "stripe": "^22.4.0",
     "tailwind-merge": "^2.2.1",
+    "word-extractor": "^1.0.4",
     "zod": "^3.22.4"
   },
   "devDependencies": {
