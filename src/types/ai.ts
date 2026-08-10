@@ -32,6 +32,22 @@ export interface ResumeAnalysisResult {
 }
 
 // ----------------------------
+// LinkedIn Optimizer (inline task prompt — see src/app/api/linkedin/route.ts,
+// no dedicated /prompts/*.md file)
+// ----------------------------
+export interface LinkedInSectionFeedback {
+  assessment: string
+  rewrite: string
+}
+
+export interface LinkedInAnalysisResult {
+  headline?: LinkedInSectionFeedback
+  about?: LinkedInSectionFeedback
+  experience?: LinkedInSectionFeedback
+  skills?: LinkedInSectionFeedback
+}
+
+// ----------------------------
 // prompts/resume-optimization.md
 // ----------------------------
 export interface ResumeOptimizationResult {

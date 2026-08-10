@@ -1,35 +1,65 @@
 // ============================================================
 // HopeAfter50 — LinkedIn Optimizer
-// Reuses prompts/resume-analysis.md guidance (no dedicated LinkedIn
-// prompt exists), framing the profile sections as the resume input.
+// LinkedIn-specific coaching (not resume guidance) — see the
+// inline task prompt in src/app/api/linkedin/route.ts.
 // ============================================================
 'use client'
 
 import { useState } from 'react'
 import Link from 'next/link'
 import PlatformNav from '@/components/platform/PlatformNav'
-import RatingBadge from '@/components/platform/RatingBadge'
-import { ResumeAnalysisResult } from '@/types/ai'
+import { LinkedInAnalysisResult, LinkedInSectionFeedback } from '@/types/ai'
 
-const CATEGORY_LABELS: Record<keyof ResumeAnalysisResult['category_scores'], string> = {
-  overall_impression: 'Overall Impression',
-  professional_summary: 'Headline & About',
-  work_experience: 'Experience Section',
-  leadership: 'Leadership',
-  measurable_results: 'Measurable Results',
-  technical_skills: 'Technical Skills',
-  education: 'Education',
-  readability: 'Readability',
-  formatting: 'Formatting',
+const SECTION_LABELS: Record<keyof LinkedInAnalysisResult, string> = {
+  headline: 'Headline',
+  about: 'About / Summary',
+  experience: 'Experience',
+  skills: 'Skills',
+}
+
+function SectionCard({ sectionKey, label, feedback }: { sectionKey: string; label: string; feedback: LinkedInSectionFeedback }) {
+  const [copied, setCopied] = useState(false)
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(feedback.rewrite)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Copy failed:', err)
+    }
+  }
+
+  return (
+    <div className="card" key={sectionKey}>
+      <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">{label}</p>
+      <p className="font-body text-navy whitespace-pre-line mb-4">{feedback.assessment}</p>
+
+      <div className="relative bg-amber-pale border border-amber-hope/30 rounded-card p-4 pt-10">
+        <p className="font-body text-slate-supporting text-xs tracking-widest uppercase absolute top-3 left-4">
+          Here&apos;s what to use instead
+        </p>
+        <button
+          type="button"
+          onClick={handleCopy}
+          className="absolute top-2 right-2 font-body text-xs font-semibold px-3 py-1.5 rounded-card bg-navy text-warm-white hover:opacity-90 transition"
+        >
+          {copied ? 'Copied ✓' : 'Copy'}
+        </button>
+        <p className="font-body text-navy whitespace-pre-line">{feedback.rewrite}</p>
+      </div>
+    </div>
+  )
 }
 
 export default function LinkedInToolPage() {
   const [headline, setHeadline] = useState('')
   const [about, setAbout] = useState('')
   const [experience, setExperience] = useState('')
+  const [skills, setSkills] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [result, setResult] = useState<ResumeAnalysisResult | null>(null)
+  const [result, setResult] = useState<LinkedInAnalysisResult | null>(null)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -40,7 +70,7 @@ export default function LinkedInToolPage() {
       const res = await fetch('/api/linkedin', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ headline, about, experience }),
+        body: JSON.stringify({ headline, about, experience, skills }),
       })
       const data = await res.json()
 
@@ -56,6 +86,12 @@ export default function LinkedInToolPage() {
       setLoading(false)
     }
   }
+
+  const sectionEntries = result
+    ? (Object.keys(SECTION_LABELS) as (keyof LinkedInAnalysisResult)[])
+        .filter((key) => result[key])
+        .map((key) => ({ key, label: SECTION_LABELS[key], feedback: result[key]! }))
+    : []
 
   return (
     <div className="min-h-screen bg-warm-white">
@@ -90,7 +126,7 @@ export default function LinkedInToolPage() {
               />
             </div>
             <div>
-              <label className="font-body text-sm text-slate-supporting mb-1 block">About</label>
+              <label className="font-body text-sm text-slate-supporting mb-1 block">About / Summary</label>
               <textarea
                 value={about}
                 onChange={(e) => setAbout(e.target.value)}
@@ -109,12 +145,22 @@ export default function LinkedInToolPage() {
                 className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope"
               />
             </div>
+            <div>
+              <label className="font-body text-sm text-slate-supporting mb-1 block">Skills</label>
+              <textarea
+                value={skills}
+                onChange={(e) => setSkills(e.target.value)}
+                rows={3}
+                placeholder="Paste your Skills section here."
+                className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope"
+              />
+            </div>
 
             {error && <p className="font-body text-sm text-red-700 bg-red-50 rounded-card px-4 py-3">{error}</p>}
 
             <button
               type="submit"
-              disabled={loading || (!headline.trim() && !about.trim() && !experience.trim())}
+              disabled={loading || (!headline.trim() && !about.trim() && !experience.trim() && !skills.trim())}
               className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? 'Analyzing your profile…' : 'Analyze My LinkedIn Profile'}
@@ -123,62 +169,10 @@ export default function LinkedInToolPage() {
         )}
 
         {result && (
-          <div className="space-y-8">
-            <div className="card">
-              <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Overall Impression</p>
-              <div className="flex flex-wrap gap-2 mb-4">
-                <RatingBadge label={result.overall_rating} />
-                <RatingBadge label={result.executive_presence} />
-                <RatingBadge label={`Target Alignment: ${result.target_alignment}`} />
-              </div>
-              <p className="font-body text-navy whitespace-pre-line">{result.overall_assessment}</p>
-            </div>
-
-            <div className="card">
-              <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-4">Profile Health Check</p>
-              <div className="grid sm:grid-cols-3 gap-3">
-                {(Object.keys(CATEGORY_LABELS) as (keyof ResumeAnalysisResult['category_scores'])[]).map((key) => (
-                  <div key={key} className="p-3 rounded-card bg-sage">
-                    <p className="font-body text-navy text-sm font-medium mb-1">{CATEGORY_LABELS[key]}</p>
-                    <RatingBadge label={result.category_scores[key]} />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="card">
-                <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Strengths</p>
-                <ul className="space-y-2">
-                  {result.strengths.map((s, i) => (
-                    <li key={i} className="flex gap-2 font-body text-navy text-sm">
-                      <span className="text-amber-hope">✓</span>{s}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="card">
-                <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Opportunities to Improve</p>
-                <ul className="space-y-2">
-                  {result.improvements.map((s, i) => (
-                    <li key={i} className="flex gap-2 font-body text-navy text-sm">
-                      <span className="text-amber-hope">{i + 1}.</span>{s}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
-
-            {result.missing_information.length > 0 && (
-              <div className="card bg-sage">
-                <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Worth Adding (if accurate)</p>
-                <ul className="space-y-1">
-                  {result.missing_information.map((s, i) => (
-                    <li key={i} className="font-body text-navy text-sm">• {s}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
+          <div className="space-y-6">
+            {sectionEntries.map(({ key, label, feedback }) => (
+              <SectionCard key={key} sectionKey={key} label={label} feedback={feedback} />
+            ))}
 
             <div className="flex gap-4">
               <button

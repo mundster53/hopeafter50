@@ -32,19 +32,24 @@ export class AiResponseParseError extends Error {
  */
 export async function runStructuredPrompt<T>({
   promptFile,
+  taskPrompt: rawTaskPrompt,
   input,
   maxTokens = 4096,
   extraSystemInstruction,
 }: {
-  promptFile: string
+  /** One of /prompts/*.md. Omit and pass `taskPrompt` instead for an inline task prompt. */
+  promptFile?: string
+  /** Inline task prompt text, for tools with no dedicated /prompts/*.md file. */
+  taskPrompt?: string
   input: unknown
   maxTokens?: number
   extraSystemInstruction?: string
 }): Promise<T> {
   const systemPrompt = loadPrompt('system.md')
+  const basePrompt = rawTaskPrompt ?? loadPrompt(promptFile!)
   const taskPrompt = extraSystemInstruction
-    ? `${loadPrompt(promptFile)}\n\n---\n\n${extraSystemInstruction}`
-    : loadPrompt(promptFile)
+    ? `${basePrompt}\n\n---\n\n${extraSystemInstruction}`
+    : basePrompt
   const userContent = typeof input === 'string' ? input : JSON.stringify(input, null, 2)
 
   // Models occasionally ignore the "return JSON" instruction and respond with
