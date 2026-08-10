@@ -105,7 +105,7 @@ model Member {
 model Assessment {
   id          String   @id @default(cuid())
   memberId    String   @unique
-  member      Member   @relation(fields: [memberId], references: [id])
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   completedAt DateTime @default(now())
 
   situation          String
@@ -127,7 +127,7 @@ model Assessment {
 model RebuildPlan {
   id          String   @id @default(cuid())
   memberId    String   @unique
-  member      Member   @relation(fields: [memberId], references: [id])
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   generatedAt DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -145,7 +145,7 @@ model RebuildPlan {
 model WeeklyCheckIn {
   id          String   @id @default(cuid())
   memberId    String
-  member      Member   @relation(fields: [memberId], references: [id])
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   week        String // ISO week string e.g. "2025-W12"
   rating      String
   comment     String?
@@ -171,7 +171,7 @@ model WeeklyCheckIn {
 model MemberMilestone {
   id          String   @id @default(cuid())
   memberId    String
-  member      Member   @relation(fields: [memberId], references: [id])
+  member      Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   milestoneId String
   completedAt DateTime @default(now())
 
@@ -187,7 +187,7 @@ model MemberMilestone {
 model ResumeAnalysis {
   id               String   @id @default(cuid())
   memberId         String
-  member           Member   @relation(fields: [memberId], references: [id])
+  member           Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   resumeFileUrl    String? // Vercel Blob URL of the uploaded file
   resumeText       String   @db.Text
   targetRoles      String[]
@@ -201,7 +201,7 @@ model ResumeAnalysis {
 model ResumeOptimization {
   id                      String   @id @default(cuid())
   memberId                String
-  member                  Member   @relation(fields: [memberId], references: [id])
+  member                  Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   resumeAnalysisId        String?
   optimizedResumeMarkdown String   @db.Text
   majorChanges            String[]
@@ -213,7 +213,7 @@ model ResumeOptimization {
 model ResumeTailoring {
   id                     String   @id @default(cuid())
   memberId               String
-  member                 Member   @relation(fields: [memberId], references: [id])
+  member                 Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   resumeOptimizationId   String?
   jobDescription         String   @db.Text
   tailoredResumeMarkdown String   @db.Text
@@ -226,7 +226,7 @@ model ResumeTailoring {
 model OpportunityEvaluation {
   id             String   @id @default(cuid())
   memberId       String
-  member         Member   @relation(fields: [memberId], references: [id])
+  member         Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   jobTitle       String
   company        String
   jobDescription String   @db.Text
@@ -239,7 +239,7 @@ model OpportunityEvaluation {
 model CoverLetter {
   id                      String   @id @default(cuid())
   memberId                String
-  member                  Member   @relation(fields: [memberId], references: [id])
+  member                  Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   opportunityEvaluationId String?
   jobTitle                String
   company                 String
@@ -253,7 +253,7 @@ model CoverLetter {
 model InterviewPrep {
   id        String   @id @default(cuid())
   memberId  String
-  member    Member   @relation(fields: [memberId], references: [id])
+  member    Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   jobTitle  String
   company   String
   prep      Json // full prompts/interview-prep.md output
@@ -263,7 +263,7 @@ model InterviewPrep {
 model LinkedInOptimization {
   id         String   @id @default(cuid())
   memberId   String
-  member     Member   @relation(fields: [memberId], references: [id])
+  member     Member   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   headline   String?  @db.Text
   about      String?  @db.Text
   experience String?  @db.Text
@@ -279,7 +279,7 @@ model LinkedInOptimization {
 model DailyEncouragement {
   id          String    @id @default(cuid())
   memberId    String
-  member      Member    @relation(fields: [memberId], references: [id])
+  member      Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
   date        String // "YYYY-MM-DD" in America/Chicago
   message     String    @db.Text
   emailSentAt DateTime?
@@ -311,7 +311,7 @@ model SupportRequest {
 model Partner {
   id               String   @id @default(cuid())
   memberId         String?
-  member           Member?  @relation(fields: [memberId], references: [id])
+  member           Member?  @relation(fields: [memberId], references: [id], onDelete: SetNull)
   email            String
   organizationName String?
   amount           Int // in cents
