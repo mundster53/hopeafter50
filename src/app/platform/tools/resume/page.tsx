@@ -56,6 +56,12 @@ export default function ResumeToolPage() {
 
   const [partnerAskDismissed, setPartnerAskDismissed] = useState(true)
 
+  // Defensive: only treat `result` as displayable once both halves are
+  // actually present. A partially-formed result (e.g. an older saved
+  // record, or a response missing a field the AI is supposed to always
+  // return) should fall back to the upload form instead of crashing.
+  const hasValidResult = Boolean(result && result.analysis && result.optimization)
+
   useEffect(() => {
     setPartnerAskDismissed(localStorage.getItem('partnerAskDismissed') === 'true')
   }, [])
@@ -73,10 +79,16 @@ export default function ResumeToolPage() {
     async function loadHistory() {
       try {
         const res = await fetch('/api/resume')
-        const data = await res.json()
-        if (!cancelled && res.ok && data.success && data.latest) {
+        const data = await res.json().catch(() => null)
+        if (
+          !cancelled &&
+          res.ok &&
+          data?.success &&
+          data.latest?.analysis &&
+          data.latest?.optimization
+        ) {
           setResult({ analysis: data.latest.analysis, optimization: data.latest.optimization })
-          setOptimizationId(data.latest.optimizationId)
+          setOptimizationId(data.latest.optimizationId ?? null)
           setTargetRoles((data.latest.targetRoles ?? []).join(', '))
           setTargetIndustries((data.latest.targetIndustries ?? []).join(', '))
           setLoadedFromHistory(true)
@@ -107,10 +119,10 @@ export default function ResumeToolPage() {
       formData.append('targetIndustries', targetIndustries)
 
       const res = await fetch('/api/resume', { method: 'POST', body: formData })
-      const data = await res.json()
+      const data = await res.json().catch(() => null)
 
-      if (!res.ok || !data.success) {
-        setError(data.error ?? 'Something went wrong. Please try again.')
+      if (!res.ok || !data?.success || !data.analysis || !data.optimization) {
+        setError(data?.error ?? 'Something went wrong. Please try again.')
         return
       }
 
@@ -138,10 +150,10 @@ export default function ResumeToolPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ targetRoles: roles, targetIndustries: industries }),
       })
-      const data = await res.json()
+      const data = await res.json().catch(() => null)
 
-      if (!res.ok || !data.success) {
-        setReanalyzeError(data.error ?? 'Something went wrong. Please try again.')
+      if (!res.ok || !data?.success || !data.analysis || !data.optimization) {
+        setReanalyzeError(data?.error ?? 'Something went wrong. Please try again.')
         return
       }
 
@@ -172,7 +184,7 @@ export default function ResumeToolPage() {
   }
 
   async function handleDownload() {
-    if (!result) return
+    if (!result?.optimization) return
     setDownloading(true)
     setDownloadError(null)
 
@@ -180,7 +192,7 @@ export default function ResumeToolPage() {
       const res = await fetch('/api/resume/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeMarkdown: result.optimization.optimized_resume_markdown }),
+        body: JSON.stringify({ resumeMarkdown: result.optimization.optimized_resume_markdown ?? '' }),
       })
 
       if (!res.ok) {
@@ -208,7 +220,7 @@ export default function ResumeToolPage() {
 
   async function handleTailor(e: React.FormEvent) {
     e.preventDefault()
-    if (!result || !jobDescription.trim()) return
+    if (!result?.optimization || !jobDescription.trim()) return
     setTailoring(true)
     setTailorError(null)
 
@@ -217,19 +229,19 @@ export default function ResumeToolPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          optimizedResumeMarkdown: result.optimization.optimized_resume_markdown,
+          optimizedResumeMarkdown: result.optimization.optimized_resume_markdown ?? '',
           jobDescription,
           resumeOptimizationId: optimizationId,
         }),
       })
-      const data = await res.json()
+      const data = await res.json().catch(() => null)
 
-      if (!res.ok || !data.success) {
-        setTailorError(data.error ?? 'Something went wrong. Please try again.')
+      if (!res.ok || !data?.success) {
+        setTailorError(data?.error ?? 'Something went wrong. Please try again.')
         return
       }
 
-      setTailoringResult(data.tailoring)
+      setTailoringResult(data.tailoring ?? null)
     } catch (err) {
       console.error(err)
       setTailorError('Something went wrong. Please try again.')
@@ -247,7 +259,7 @@ export default function ResumeToolPage() {
       const res = await fetch('/api/resume/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resumeMarkdown: tailoringResult.tailored_resume_markdown }),
+        body: JSON.stringify({ resumeMarkdown: tailoringResult.tailored_resume_markdown ?? '' }),
       })
 
       if (!res.ok) {
@@ -296,7 +308,7 @@ export default function ResumeToolPage() {
           </div>
         )}
 
-        {!checkingHistory && !result && (
+        {!checkingHistory && !hasValidResult && (
           <form onSubmit={handleSubmit} className="card space-y-6">
             <div className="border-2 border-dashed border-sage rounded-card text-center py-12 px-6">
               <p className="font-display text-xl text-navy mb-2">Upload Your Résumé</p>
@@ -348,7 +360,7 @@ export default function ResumeToolPage() {
           </form>
         )}
 
-        {result && (
+        {hasValidResult && result && (
           <div className="space-y-8">
 
             {loadedFromHistory && (
@@ -383,12 +395,12 @@ export default function ResumeToolPage() {
             <div className="card">
               <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Career Snapshot</p>
               <div className="flex flex-wrap gap-2 mb-4">
-                <RatingBadge label={result.analysis.overall_rating} />
-                <RatingBadge label={result.analysis.executive_presence} />
-                <RatingBadge label={`ATS: ${result.analysis.ats_rating}`} />
-                <RatingBadge label={`Target Alignment: ${result.analysis.target_alignment}`} />
+                <RatingBadge label={result.analysis.overall_rating ?? ''} />
+                <RatingBadge label={result.analysis.executive_presence ?? ''} />
+                <RatingBadge label={`ATS: ${result.analysis.ats_rating ?? 'Unknown'}`} />
+                <RatingBadge label={`Target Alignment: ${result.analysis.target_alignment ?? 'Unknown'}`} />
               </div>
-              <p className="font-body text-navy whitespace-pre-line">{result.analysis.overall_assessment}</p>
+              <p className="font-body text-navy whitespace-pre-line">{result.analysis.overall_assessment ?? ''}</p>
             </div>
 
             {/* Category scores */}
@@ -398,7 +410,7 @@ export default function ResumeToolPage() {
                 {(Object.keys(CATEGORY_LABELS) as (keyof ResumeAnalysisResult['category_scores'])[]).map((key) => (
                   <div key={key} className="p-3 rounded-card bg-sage">
                     <p className="font-body text-navy text-sm font-medium mb-1">{CATEGORY_LABELS[key]}</p>
-                    <RatingBadge label={result.analysis.category_scores[key]} />
+                    <RatingBadge label={result.analysis.category_scores?.[key] ?? ''} />
                   </div>
                 ))}
               </div>
@@ -408,7 +420,7 @@ export default function ResumeToolPage() {
               <div className="card">
                 <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Strengths</p>
                 <ul className="space-y-2">
-                  {result.analysis.strengths.map((s, i) => (
+                  {(result.analysis.strengths ?? []).map((s, i) => (
                     <li key={i} className="flex gap-2 font-body text-navy text-sm">
                       <span className="text-amber-hope">✓</span>{s}
                     </li>
@@ -418,7 +430,7 @@ export default function ResumeToolPage() {
               <div className="card">
                 <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Opportunities to Improve</p>
                 <ul className="space-y-2">
-                  {result.analysis.improvements.map((s, i) => (
+                  {(result.analysis.improvements ?? []).map((s, i) => (
                     <li key={i} className="flex gap-2 font-body text-navy text-sm">
                       <span className="text-amber-hope">{i + 1}.</span>{s}
                     </li>
@@ -427,11 +439,11 @@ export default function ResumeToolPage() {
               </div>
             </div>
 
-            {result.analysis.missing_information.length > 0 && (
+            {(result.analysis.missing_information ?? []).length > 0 && (
               <div className="card bg-sage">
                 <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">Worth Adding (if accurate)</p>
                 <ul className="space-y-1">
-                  {result.analysis.missing_information.map((s, i) => (
+                  {(result.analysis.missing_information ?? []).map((s, i) => (
                     <li key={i} className="font-body text-navy text-sm">• {s}</li>
                   ))}
                 </ul>
@@ -442,10 +454,10 @@ export default function ResumeToolPage() {
             <div className="card">
               <div className="flex items-center justify-between mb-4">
                 <p className="font-body text-slate-supporting text-xs tracking-widest uppercase">Optimized Resume</p>
-                <RatingBadge label={`Confidence: ${result.optimization.confidence}`} />
+                <RatingBadge label={`Confidence: ${result.optimization.confidence ?? 'Unknown'}`} />
               </div>
               <div className="bg-warm-white rounded-card p-6 border border-sage">
-                <MarkdownView content={result.optimization.optimized_resume_markdown} />
+                <MarkdownView content={result.optimization.optimized_resume_markdown ?? ''} />
               </div>
               <div className="mt-6 text-center">
                 <button
@@ -467,14 +479,14 @@ export default function ResumeToolPage() {
               <div className="card">
                 <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">What Changed</p>
                 <ul className="space-y-2">
-                  {result.optimization.major_changes.map((s, i) => (
+                  {(result.optimization.major_changes ?? []).map((s, i) => (
                     <li key={i} className="flex gap-2 font-body text-navy text-sm">
                       <span className="text-amber-hope">✓</span>{s}
                     </li>
                   ))}
                 </ul>
               </div>
-              {result.optimization.recommended_follow_up.length > 0 && (
+              {(result.optimization.recommended_follow_up ?? []).length > 0 && (
                 <div className="card">
                   <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">
                     Strengthen It Further
@@ -483,7 +495,7 @@ export default function ResumeToolPage() {
                     If any of these are accurate, add them yourself — we never invent details for you.
                   </p>
                   <ul className="space-y-2">
-                    {result.optimization.recommended_follow_up.map((s, i) => (
+                    {(result.optimization.recommended_follow_up ?? []).map((s, i) => (
                       <li key={i} className="font-body text-navy text-sm">• {s}</li>
                     ))}
                   </ul>
@@ -527,7 +539,7 @@ export default function ResumeToolPage() {
                 <div className="mt-8 space-y-6">
                   <div className="flex items-center gap-3">
                     <span className="inline-block bg-amber-hope text-navy font-display font-bold text-sm px-4 py-2 rounded-full">
-                      {tailoringResult.match_label} — {tailoringResult.match_score}%
+                      {tailoringResult.match_label ?? 'Match'} — {tailoringResult.match_score ?? 0}%
                     </span>
                   </div>
 
@@ -536,7 +548,7 @@ export default function ResumeToolPage() {
                       Why You're a Strong Candidate
                     </p>
                     <ul className="space-y-2">
-                      {tailoringResult.top_strengths.map((s, i) => (
+                      {(tailoringResult.top_strengths ?? []).map((s, i) => (
                         <li key={i} className="flex gap-2 font-body text-navy text-sm">
                           <span className="text-amber-hope">✓</span>{s}
                         </li>
@@ -544,16 +556,16 @@ export default function ResumeToolPage() {
                     </ul>
                   </div>
 
-                  {tailoringResult.honest_gaps.length > 0 && (
+                  {(tailoringResult.honest_gaps ?? []).length > 0 && (
                     <div className="bg-sage rounded-card p-4">
                       <p className="font-body text-slate-supporting text-xs tracking-widest uppercase mb-3">
                         Worth Preparing For
                       </p>
                       <ul className="space-y-3">
-                        {tailoringResult.honest_gaps.map((g, i) => (
+                        {(tailoringResult.honest_gaps ?? []).map((g, i) => (
                           <li key={i} className="font-body text-navy text-sm">
-                            <p className="font-medium mb-1">{g.gap}</p>
-                            <p className="text-slate-supporting">{g.guidance}</p>
+                            <p className="font-medium mb-1">{g?.gap ?? ''}</p>
+                            <p className="text-slate-supporting">{g?.guidance ?? ''}</p>
                           </li>
                         ))}
                       </ul>
@@ -565,7 +577,7 @@ export default function ResumeToolPage() {
                       Tailored Resume
                     </p>
                     <div className="bg-warm-white rounded-card p-6 border border-sage">
-                      <MarkdownView content={tailoringResult.tailored_resume_markdown} />
+                      <MarkdownView content={tailoringResult.tailored_resume_markdown ?? ''} />
                     </div>
                     <div className="mt-6 text-center">
                       <button
