@@ -41,6 +41,13 @@ export default async function DashboardPage() {
 
       <div className="max-wide mx-auto px-6 py-8">
 
+        {/* TEMP DEBUG — remove before shipping. Shows admin-gate values for all users. */}
+        <div className="bg-red-900/80 text-white text-xs font-mono p-4 mb-4 rounded-card border-2 border-red-500">
+          <p>DEBUG session?.user?.email: {JSON.stringify(session?.user?.email)}</p>
+          <p>DEBUG ADMIN_EMAIL: {JSON.stringify(ADMIN_EMAIL)}</p>
+          <p>DEBUG match: {JSON.stringify(session?.user?.email === ADMIN_EMAIL)}</p>
+        </div>
+
         {/* Greeting */}
         <div className="mb-8">
           <h1 className="font-display text-display-sm text-white">{data.firstName ? `Welcome back, ${data.firstName}` : 'Welcome'}</h1>
