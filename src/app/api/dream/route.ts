@@ -14,6 +14,58 @@ import Anthropic from '@anthropic-ai/sdk'
 
 type ChatMessage = { role: 'user' | 'assistant'; content: string }
 
+// Keyword signals used to detect which layer the AI's response has moved
+// the conversation into. Checked in order — layer only ever advances
+// forward (see Math.max below), so an earlier match doesn't get overridden
+// by a later, unrelated phrase.
+const LAYER_SIGNALS: { layer: number; phrases: string[] }[] = [
+  {
+    layer: 2,
+    phrases: ['set aside', 'put the mortgage', 'being practical', 'just for now', 'for a few minutes'],
+  },
+  {
+    layer: 3,
+    phrases: [
+      'think back',
+      'what did you love',
+      'what do people come to you for',
+      'always wanted to do',
+      'most alive',
+      'been through',
+    ],
+  },
+  {
+    layer: 4,
+    phrases: ["i'm noticing", 'there\'s a thread', "you've said", 'connecting', "you've mentioned", 'every time you'],
+  },
+  {
+    layer: 5,
+    phrases: [
+      'put it into words',
+      'one statement',
+      'what you were put here',
+      'let me take a shot',
+      'how does that land',
+      'what would you change',
+    ],
+  },
+  {
+    layer: 6,
+    phrases: ['pay the bills', 'mortgage', 'voice in the back', 'what that might look like', 'people get paid'],
+  },
+]
+
+function detectLayer(responseText: string): number {
+  const lower = responseText.toLowerCase()
+  let detected = 1
+  for (const { layer, phrases } of LAYER_SIGNALS) {
+    if (phrases.some((phrase) => lower.includes(phrase))) {
+      detected = Math.max(detected, layer)
+    }
+  }
+  return detected
+}
+
 export async function POST(req: NextRequest) {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
@@ -58,7 +110,8 @@ export async function POST(req: NextRequest) {
 
     updatedHistory.push({ role: 'assistant', content: responseText })
 
-    const nextLayer = Math.max(currentLayer, existing?.currentLayer ?? 1)
+    const detectedLayer = detectLayer(responseText)
+    const nextLayer = Math.max(detectedLayer, existing?.currentLayer ?? 1, currentLayer)
 
     const saved = await prisma.dreamConversation.upsert({
       where: { memberId },

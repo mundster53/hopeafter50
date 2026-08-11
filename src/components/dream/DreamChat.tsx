@@ -222,11 +222,11 @@ export default function DreamChat() {
 
       {error && <p className="font-body text-sm text-red-600 mb-2">{error}</p>}
 
-      {currentLayer >= 5 && !savedDeclaration && (
+      {currentLayer >= 5 && messages.length >= 10 && !savedDeclaration && (
         <div className="mb-4 bg-amber-pale border-2 border-amber-hope rounded-card p-5">
           <p className="font-display text-navy font-semibold mb-2">Ready to put it into words?</p>
           <p className="font-body text-sm text-slate-supporting mb-3">
-            Write your purpose declaration in your own words below, then save it.
+            Ready to save your declaration? Copy what feels true from this conversation and make it yours.
           </p>
           <textarea
             value={declaration}
