@@ -37,5 +37,5 @@ export function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/platform/:path*', '/admin/:path*'],
+  matcher: ['/platform/:path*', '/admin/:path*', '/dream/:path*'],
 }

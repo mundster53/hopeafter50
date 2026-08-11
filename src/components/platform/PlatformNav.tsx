@@ -9,6 +9,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard', href: '/platform/dashboard' },
   { label: 'My Plan', href: '/platform/plan' },
   { label: 'Resume Tool', href: '/platform/tools/resume' },
+  { label: "What's My Dream?", href: '/dream' },
   { label: 'Become a Partner', href: '/platform/plan/partner' },
   { label: 'Get Help', href: '/platform/support' },
 ]

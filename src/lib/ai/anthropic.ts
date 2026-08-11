@@ -122,6 +122,37 @@ export async function runTextPrompt({
   return textBlock.text
 }
 
+/**
+ * Runs a multi-turn conversation against a fixed system prompt (no
+ * prompts/system.md layering, no JSON parsing — the caller owns the
+ * message history and gets raw assistant text back). Used by tools that
+ * are an actual back-and-forth conversation rather than a one-shot form.
+ */
+export async function runChatTurn({
+  systemPrompt,
+  messages,
+  maxTokens = 1024,
+}: {
+  systemPrompt: string
+  messages: Anthropic.MessageParam[]
+  maxTokens?: number
+}): Promise<string> {
+  const response = await getClient().messages.create({
+    model: MODEL,
+    max_tokens: maxTokens,
+    system: systemPrompt,
+    messages,
+  })
+
+  const textBlock = response.content.find(
+    (block): block is Anthropic.TextBlock => block.type === 'text'
+  )
+  if (!textBlock) {
+    throw new Error('No text content returned from Anthropic')
+  }
+  return textBlock.text
+}
+
 function parseJsonResponse<T>(text: string): T {
   // Every prompt in /prompts instructs "Return valid JSON", but models
   // occasionally wrap the object in a ```json fence — strip it if present.

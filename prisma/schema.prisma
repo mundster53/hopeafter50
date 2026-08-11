@@ -100,6 +100,7 @@ model Member {
   linkedInOptimizations  LinkedInOptimization[]
   partnerDonations       Partner[]
   dailyEncouragements    DailyEncouragement[]
+  dreamConversation      DreamConversation?
 }
 
 model Assessment {
@@ -286,6 +287,23 @@ model DailyEncouragement {
   createdAt   DateTime  @default(now())
 
   @@unique([memberId, date])
+}
+
+// ============================================================
+// "What's My Dream?" — guided discovery conversation. One conversation
+// per member, resumable across sessions.
+// ============================================================
+
+model DreamConversation {
+  id                  String    @id @default(cuid())
+  memberId            String    @unique
+  member              Member    @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  currentLayer        Int       @default(1)
+  conversationHistory Json      @default("[]")
+  purposeDeclaration  String?
+  completedAt         DateTime?
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
 }
 
 // ============================================================
