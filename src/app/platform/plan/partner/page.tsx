@@ -18,15 +18,15 @@ type Tier = {
 }
 
 const RECURRING_TIERS: Tier[] = [
-  { amount: '$11/month', priceId: 'price_1U1xu8P3pCt2RBbZkzKuVvmY', mode: 'subscription', description: 'Less than a cup of coffee a week. Keeps one member\'s tools running for a month.', cta: 'Become a Partner', featured: true },
-  { amount: '$25/month', priceId: 'price_1U1xuaP3pCt2RBbZatG8Jwtt', mode: 'subscription', description: 'Covers platform costs for one week', cta: 'Become a Partner' },
-  { amount: '$50/month', priceId: 'price_1U1xv3P3pCt2RBbZViL8zwjz', mode: 'subscription', description: 'Funds a month of AI tools for five members', cta: 'Become a Partner' },
+  { amount: '$11/month', priceId: 'price_1U1u4SP3pCt2RBbZJUahh3mR', mode: 'subscription', description: 'Less than a cup of coffee a week. Keeps one member\'s tools running for a month.', cta: 'Become a Partner', featured: true },
+  { amount: '$25/month', priceId: 'price_1U1u5BP3pCt2RBbZpsy2m7HQ', mode: 'subscription', description: 'Covers platform costs for one week', cta: 'Become a Partner' },
+  { amount: '$50/month', priceId: 'price_1U1u63P3pCt2RBbZAAL9cQ8D', mode: 'subscription', description: 'Funds a month of AI tools for five members', cta: 'Become a Partner' },
 ]
 
 const ONE_TIME_TIERS: Tier[] = [
-  { amount: '$25', priceId: 'price_1U1xwIP3pCt2RBbZnHFelVGx', mode: 'payment', description: 'A simple thank you', cta: 'Give Once' },
-  { amount: '$50', priceId: 'price_1U1xwlP3pCt2RBbZNcrJj3IH', mode: 'payment', description: 'Help someone else find their next step', cta: 'Give Once' },
-  { amount: '$100', priceId: 'price_1U1xxGP3pCt2RBbZ87m97iMy', mode: 'payment', description: 'A generous gift', cta: 'Give Once' },
+  { amount: '$25', priceId: 'price_1U1u6uP3pCt2RBbZGIHWp9nT', mode: 'payment', description: 'A simple thank you', cta: 'Give Once' },
+  { amount: '$50', priceId: 'price_1U1u7UP3pCt2RBbZEa0f9RW1', mode: 'payment', description: 'Help someone else find their next step', cta: 'Give Once' },
+  { amount: '$100', priceId: 'price_1U1u8GP3pCt2RBbZlZnAZ81S', mode: 'payment', description: 'A generous gift', cta: 'Give Once' },
 ]
 
 function TierCard({ tier, onSelect, loading }: { tier: Tier; onSelect: (tier: Tier) => void; loading: boolean }) {
