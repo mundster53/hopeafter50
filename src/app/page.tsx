@@ -8,6 +8,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import Nav from '@/components/marketing/Nav'
 import Footer from '@/components/marketing/Footer'
+import ScrollToAnchorButton from '@/components/marketing/ScrollToAnchorButton'
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions)
@@ -55,16 +56,12 @@ function Hero({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }) {
           <Link href={ctaHref} className="btn-primary text-lg py-5 px-10">
             {ctaLabel}
           </Link>
-          <a
-            href="#what-you-get"
-            onClick={(e) => {
-              e.preventDefault()
-              document.getElementById('what-you-get')?.scrollIntoView({ behavior: 'smooth' })
-            }}
+          <ScrollToAnchorButton
+            targetId="what-you-get"
             className="font-body text-lg text-white border border-white/60 rounded-full py-5 px-10 hover:bg-white/10 transition-colors"
           >
             See What Members Get
-          </a>
+          </ScrollToAnchorButton>
         </div>
       </div>
       <div className="absolute bottom-16 left-0 right-0 flex justify-center">
