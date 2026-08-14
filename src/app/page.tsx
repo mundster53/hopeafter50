@@ -63,7 +63,7 @@ function Hero({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }) {
             See What Members Get
           </ScrollToAnchorButton>
         </div>
-        <p className="font-body text-sm text-white/70 italic text-center mt-6">
+        <p className="font-body text-lg font-semibold text-amber-hope text-center mt-6">
           Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
         </p>
       </div>
@@ -99,9 +99,11 @@ function MoreThanEncouragement() {
             and start thinking beyond the job you lost.
           </p>
         </div>
-        <p className="font-body text-sm text-slate-supporting italic text-center mt-8">
-          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
-        </p>
+        <div className="flex justify-center mt-8">
+          <p className="font-body text-lg font-semibold text-navy bg-sage/50 border-l-4 border-amber-hope rounded-full px-6 py-3 text-center">
+            Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+          </p>
+        </div>
       </div>
     </section>
   )
@@ -175,9 +177,11 @@ function WhatYouGet({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }
             </div>
           ))}
         </div>
-        <p className="font-body text-sm text-slate-supporting italic text-center mb-6">
-          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
-        </p>
+        <div className="flex justify-center mb-6">
+          <p className="font-body text-lg font-semibold text-navy bg-amber-hope/15 border-l-4 border-amber-hope rounded-full px-6 py-3 text-center">
+            Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+          </p>
+        </div>
         <div className="text-center">
           <Link href={ctaHref} className="btn-primary text-lg py-5 px-10">
             {ctaLabel}
@@ -245,7 +249,7 @@ function TheBiggerQuestion({ ctaHref }: { ctaHref: string }) {
         <p className="font-body text-lg text-white mb-12">
           You don't have to have the answer today. But it's worth asking the question.
         </p>
-        <p className="font-body text-sm text-white/70 italic text-center mb-6">
+        <p className="font-body text-lg font-semibold text-amber-hope text-center mb-6">
           Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
         </p>
         <div className="text-center">
@@ -291,9 +295,11 @@ function YouAreNotAlone() {
         <p className="font-display text-2xl text-navy">
           We believe there is still a future worth pursuing.
         </p>
-        <p className="font-body text-sm text-slate-supporting italic text-center mt-8">
-          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
-        </p>
+        <div className="flex justify-center mt-8">
+          <p className="font-body text-lg font-semibold text-navy bg-sage/50 border-l-4 border-amber-hope rounded-full px-6 py-3 text-center">
+            Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+          </p>
+        </div>
       </div>
     </section>
   )
@@ -347,9 +353,11 @@ function WhatHappensWhenYouJoin() {
             </div>
           ))}
         </div>
-        <p className="font-body text-sm text-slate-supporting italic text-center mt-10">
-          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
-        </p>
+        <div className="flex justify-center mt-10">
+          <p className="font-body text-lg font-semibold text-navy bg-amber-hope/15 border-l-4 border-amber-hope rounded-full px-6 py-3 text-center">
+            Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+          </p>
+        </div>
       </div>
     </section>
   )
@@ -380,7 +388,7 @@ function FinalCTA({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }) 
         <Link href={ctaHref} className="btn-primary text-lg py-5 px-10">
           {ctaLabel}
         </Link>
-        <p className="font-body text-sm text-white/70 italic mt-6">
+        <p className="font-body text-lg font-semibold text-amber-hope mt-6">
           Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
         </p>
       </div>
