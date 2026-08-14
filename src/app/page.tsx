@@ -63,6 +63,9 @@ function Hero({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }) {
             See What Members Get
           </ScrollToAnchorButton>
         </div>
+        <p className="font-body text-sm text-white/70 italic text-center mt-6">
+          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+        </p>
       </div>
       <div className="absolute bottom-16 left-0 right-0 flex justify-center">
         <div className="animate-bounce text-white/70">
@@ -96,6 +99,9 @@ function MoreThanEncouragement() {
             and start thinking beyond the job you lost.
           </p>
         </div>
+        <p className="font-body text-sm text-slate-supporting italic text-center mt-8">
+          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+        </p>
       </div>
     </section>
   )
@@ -169,6 +175,9 @@ function WhatYouGet({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }
             </div>
           ))}
         </div>
+        <p className="font-body text-sm text-slate-supporting italic text-center mb-6">
+          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+        </p>
         <div className="text-center">
           <Link href={ctaHref} className="btn-primary text-lg py-5 px-10">
             {ctaLabel}
@@ -236,6 +245,9 @@ function TheBiggerQuestion({ ctaHref }: { ctaHref: string }) {
         <p className="font-body text-lg text-white mb-12">
           You don't have to have the answer today. But it's worth asking the question.
         </p>
+        <p className="font-body text-sm text-white/70 italic text-center mb-6">
+          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+        </p>
         <div className="text-center">
           <Link href={ctaHref} className="btn-primary text-lg py-5 px-10">
             Start Exploring What's Next
@@ -278,6 +290,9 @@ function YouAreNotAlone() {
         </div>
         <p className="font-display text-2xl text-navy">
           We believe there is still a future worth pursuing.
+        </p>
+        <p className="font-body text-sm text-slate-supporting italic text-center mt-8">
+          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
         </p>
       </div>
     </section>
@@ -332,6 +347,9 @@ function WhatHappensWhenYouJoin() {
             </div>
           ))}
         </div>
+        <p className="font-body text-sm text-slate-supporting italic text-center mt-10">
+          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+        </p>
       </div>
     </section>
   )
@@ -362,6 +380,9 @@ function FinalCTA({ ctaLabel, ctaHref }: { ctaLabel: string; ctaHref: string }) 
         <Link href={ctaHref} className="btn-primary text-lg py-5 px-10">
           {ctaLabel}
         </Link>
+        <p className="font-body text-sm text-white/70 italic mt-6">
+          Free to join. Always. Hope After 50 runs entirely on the generosity of people who believe in this mission.
+        </p>
       </div>
     </section>
   )
