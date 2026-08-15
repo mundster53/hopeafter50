@@ -69,6 +69,7 @@ model VerificationToken {
 model Member {
   id                      String   @id @default(cuid()) // matches User.id
   firstName               String
+  lastName                String   @default("")
   email                   String   @unique
   user                    User     @relation(fields: [id], references: [id])
   ageRange                String?
@@ -101,6 +102,17 @@ model Member {
   partnerDonations       Partner[]
   dailyEncouragements    DailyEncouragement[]
   dreamConversation      DreamConversation?
+}
+
+// Holds the first/last name a member types on the sign-in form
+// while they wait to click their magic link. Consumed (and deleted)
+// once their Member record is created, so it never lingers.
+model PendingSignupName {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  createdAt DateTime @default(now())
 }
 
 model Assessment {

@@ -65,22 +65,50 @@ export const authOptions: NextAuthOptions = {
       if (url.startsWith(baseUrl)) return url
       return baseUrl
     },
+
+    // Every time a member clicks their magic link, apply whatever name
+    // they typed on the sign-in form (returning members re-enter it too,
+    // so this keeps their name current on every sign-in).
+    async signIn({ user }) {
+      if (user.email) {
+        await applyPendingName(user.email)
+      }
+      return true
+    },
   },
 
   events: {
     // When a new member signs in for the first time, create their Member record
     async createUser({ user }) {
+      const pending = await prisma.pendingSignupName.findUnique({ where: { email: user.email! } })
       await prisma.member.upsert({
         where: { email: user.email! },
         update: {},
         create: {
           id: user.id,
           email: user.email!,
-          firstName: user.name?.split(' ')[0] ?? '',
+          firstName: pending?.firstName ?? user.name?.split(' ')[0] ?? '',
+          lastName: pending?.lastName ?? '',
         },
       })
     },
   },
+}
+
+// ----------------------------
+// Apply the name a member typed on the sign-in form to their Member
+// record, then clear the pending record so it doesn't linger.
+// ----------------------------
+async function applyPendingName(email: string) {
+  const pending = await prisma.pendingSignupName.findUnique({ where: { email } })
+  if (!pending) return
+
+  await prisma.member.updateMany({
+    where: { email },
+    data: { firstName: pending.firstName, lastName: pending.lastName },
+  })
+
+  await prisma.pendingSignupName.delete({ where: { email } })
 }
 
 // ----------------------------

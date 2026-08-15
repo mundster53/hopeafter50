@@ -15,13 +15,36 @@ const REASSURANCES = [
 ]
 
 export default function SignInPage() {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   async function handleEmailSignIn(e: React.FormEvent) {
     e.preventDefault()
+
+    if (!firstName.trim() || !lastName.trim()) {
+      setError('Please tell us your first and last name.')
+      return
+    }
+    setError('')
     setLoading(true)
+
+    try {
+      await fetch('/api/auth/register-name', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, firstName: firstName.trim(), lastName: lastName.trim() }),
+      })
+    } catch {
+      // If this fails, sign-in still proceeds — the name is a nice-to-have, not a blocker
+    }
+
+    localStorage.setItem('ha50_firstName', firstName.trim())
+    localStorage.setItem('ha50_lastName', lastName.trim())
+
     await signIn('email', { email, callbackUrl: '/platform/dashboard', redirect: false })
     setSent(true)
     setLoading(false)
@@ -66,6 +89,34 @@ export default function SignInPage() {
             </p>
 
             <form onSubmit={handleEmailSignIn} className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="font-body text-sm text-white/70 mb-1 block">
+                    First name
+                  </label>
+                  <input
+                    type="text"
+                    value={firstName}
+                    onChange={e => setFirstName(e.target.value)}
+                    placeholder="First name"
+                    required
+                    className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
+                  />
+                </div>
+                <div>
+                  <label className="font-body text-sm text-white/70 mb-1 block">
+                    Last name
+                  </label>
+                  <input
+                    type="text"
+                    value={lastName}
+                    onChange={e => setLastName(e.target.value)}
+                    placeholder="Last name"
+                    required
+                    className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
+                  />
+                </div>
+              </div>
               <div>
                 <label className="font-body text-sm text-white/70 mb-1 block">
                   Your email address
@@ -79,9 +130,12 @@ export default function SignInPage() {
                   className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
                 />
               </div>
+              {error && (
+                <p className="font-body text-sm text-red-400">{error}</p>
+              )}
               <button
                 type="submit"
-                disabled={loading || !email}
+                disabled={loading || !email || !firstName.trim() || !lastName.trim()}
                 className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Sending...' : 'Send My Secure Link'}
