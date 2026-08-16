@@ -17,6 +17,7 @@ const REASSURANCES = [
 export default function SignInPage() {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
+  const [layoffDate, setLayoffDate] = useState('')
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -36,7 +37,12 @@ export default function SignInPage() {
       await fetch('/api/auth/register-name', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, firstName: firstName.trim(), lastName: lastName.trim() }),
+        body: JSON.stringify({
+          email,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          layoffDate: layoffDate.trim(),
+        }),
       })
     } catch {
       // If this fails, sign-in still proceeds — the name is a nice-to-have, not a blocker
@@ -44,6 +50,7 @@ export default function SignInPage() {
 
     localStorage.setItem('ha50_firstName', firstName.trim())
     localStorage.setItem('ha50_lastName', lastName.trim())
+    localStorage.setItem('ha50_layoffDate', layoffDate.trim())
 
     await signIn('email', { email, callbackUrl: '/platform/dashboard', redirect: false })
     setSent(true)
@@ -116,6 +123,18 @@ export default function SignInPage() {
                     className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
                   />
                 </div>
+              </div>
+              <div>
+                <label className="font-body text-sm text-white/70 mb-1 block">
+                  When did you last lose a job?
+                </label>
+                <input
+                  type="month"
+                  value={layoffDate}
+                  onChange={e => setLayoffDate(e.target.value)}
+                  max={new Date().toISOString().slice(0, 7)}
+                  className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
+                />
               </div>
               <div>
                 <label className="font-body text-sm text-white/70 mb-1 block">

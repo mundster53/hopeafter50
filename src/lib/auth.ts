@@ -89,6 +89,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email!,
           firstName: pending?.firstName ?? user.name?.split(' ')[0] ?? '',
           lastName: pending?.lastName ?? '',
+          layoffDate: pending?.layoffDate ?? null,
         },
       })
     },
@@ -105,7 +106,11 @@ async function applyPendingName(email: string) {
 
   await prisma.member.updateMany({
     where: { email },
-    data: { firstName: pending.firstName, lastName: pending.lastName },
+    data: {
+      firstName: pending.firstName,
+      lastName: pending.lastName,
+      ...(pending.layoffDate ? { layoffDate: pending.layoffDate } : {}),
+    },
   })
 
   await prisma.pendingSignupName.delete({ where: { email } })

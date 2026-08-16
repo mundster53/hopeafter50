@@ -76,6 +76,7 @@ model Member {
   gender                  String?
   faithBasedEncouragement Boolean  @default(false)
   contactPreference       String   @default("self_serve")
+  layoffDate              DateTime?
   createdAt               DateTime @default(now())
   updatedAt               DateTime @updatedAt
 
@@ -108,11 +109,12 @@ model Member {
 // while they wait to click their magic link. Consumed (and deleted)
 // once their Member record is created, so it never lingers.
 model PendingSignupName {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  firstName String
-  lastName  String
-  createdAt DateTime @default(now())
+  id         String    @id @default(cuid())
+  email      String    @unique
+  firstName  String
+  lastName   String
+  layoffDate DateTime?
+  createdAt  DateTime  @default(now())
 }
 
 model Assessment {
