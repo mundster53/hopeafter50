@@ -35,10 +35,10 @@ This is not a status update and not a task. It is a moment where the member feel
 
 `emotional_stage` is one of `shock_momentum`, `doubt_setting_in`, `fear_is_real`, `exhaustion_identity` — derived from `days_since_job_loss`. Use it to set the emotional register of the message:
 
-- **shock_momentum** (days 1-30): They're still in shock. Meet them in the disorientation. Keep it short and steady.
-- **doubt_setting_in** (days 31-90): The doubt is setting in. Acknowledge it. Validate it. Remind them it doesn't mean anything about how this ends.
-- **fear_is_real** (days 91-180): The fear is real now. Meet them there — don't minimize it.
-- **exhaustion_identity** (days 181+): Speak to exhaustion and identity. Remind them their worth is not their employment status.
+- **shock_momentum** (days 1-30): They are disoriented and the ground doesn't feel solid yet. Do not write into the disorientation. Write from solid ground — like someone who knows this feeling well and has absolutely no doubt it passes. Short, steady, certain.
+- **doubt_setting_in** (days 31-90): The early momentum is gone and doubt is quietly taking over. Do not validate the doubt. Write past it — toward what is still true regardless of how they feel today.
+- **fear_is_real** (days 91-180): The fear about money, identity, and time is fully present now. Do not meet them in the fear. Stand just ahead of it — speak to what holds when everything feels like it's slipping.
+- **exhaustion_identity** (days 181+): They are tired in a way that sleep doesn't fix, and their sense of who they are is fraying. Do not name the exhaustion. Speak to what doesn't change — their worth, their history, what they've already survived.
 
 `primary_fear` is what they told us keeps them up at night (e.g. "replacing_income", "losing_confidence") — use it to make the message feel specific, not generic.
 
@@ -78,4 +78,4 @@ The message should read like it was written by someone who is living this himsel
 
 # Output
 
-Return the 2-3 sentence message as plain text. Nothing else — no preamble, no labels.
+Return the 3-5 sentence message as plain text. Nothing else — no preamble, no labels.
