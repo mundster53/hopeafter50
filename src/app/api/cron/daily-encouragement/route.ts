@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
 
   for (const member of members) {
     try {
-      const encouragement = await getDailyEncouragement(member.id, now)
+      const encouragement = await getDailyEncouragement(member.id, now, !!testEmail)
       if (!encouragement) continue
       if (encouragement.emailSentAt && !testEmail) continue
 

@@ -66,13 +66,19 @@ function emotionalStageFor(days: number): string {
  * first request of the day. Safe to call repeatedly — later calls the
  * same day return the cached row instead of re-hitting the Anthropic API.
  */
-export async function getDailyEncouragement(memberId: string, now: Date = new Date()) {
+export async function getDailyEncouragement(
+  memberId: string,
+  now: Date = new Date(),
+  forceRegenerate = false
+) {
   const date = chicagoDateString(now)
 
-  const existing = await prisma.dailyEncouragement.findUnique({
-    where: { memberId_date: { memberId, date } },
-  })
-  if (existing) return existing
+  if (!forceRegenerate) {
+    const existing = await prisma.dailyEncouragement.findUnique({
+      where: { memberId_date: { memberId, date } },
+    })
+    if (existing) return existing
+  }
 
   const member = await prisma.member.findUnique({
     where: { id: memberId },
@@ -97,6 +103,10 @@ export async function getDailyEncouragement(memberId: string, now: Date = new Da
       maxTokens: 300,
     })
   ).trim()
+
+  if (forceRegenerate) {
+    return { memberId, date, message, emailSentAt: null as Date | null }
+  }
 
   return prisma.dailyEncouragement.upsert({
     where: { memberId_date: { memberId, date } },
