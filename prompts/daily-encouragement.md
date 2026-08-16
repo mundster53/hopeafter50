@@ -66,6 +66,8 @@ Use `days_since_job_loss` and `emotional_stage` (see above) to write for the fee
 
 Do not use the member's name in the message body, even if `firstName` is given.
 
+Do NOT use gendered language — no "men," "women," "he," "she." Write in second person ("you") only. You do not know the member's gender.
+
 Do not manufacture excitement. Do not use motivational clichés (see system prompt).
 
 Never use the words "assessment", "intake", or "intake assessment." Never tell the member to complete, fill out, or submit any form or assessment.
