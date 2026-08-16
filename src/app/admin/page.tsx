@@ -12,6 +12,7 @@ import { DeleteMemberButton } from '@/components/admin/DeleteMemberButton'
 import { DeletePartnerButton } from '@/components/admin/DeletePartnerButton'
 import { ResolvedToggle } from '@/components/admin/ResolvedToggle'
 import { BroadcastForm } from '@/components/admin/BroadcastForm'
+import { TestEncouragementButton } from '@/components/admin/TestEncouragementButton'
 
 export default async function AdminPage() {
   const session = await getServerSession(authOptions)
@@ -259,6 +260,14 @@ export default async function AdminPage() {
               buttonLabel="Send to All Partners"
               recipientLabel="partners"
             />
+          </div>
+        </section>
+
+        {/* Test Daily Word email */}
+        <section>
+          <h2 className="font-display text-lg text-white mb-3">Daily Word</h2>
+          <div className="bg-white/5 border border-white/10 rounded-card p-5">
+            <TestEncouragementButton />
           </div>
         </section>
       </div>
