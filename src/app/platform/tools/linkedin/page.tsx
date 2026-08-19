@@ -8,7 +8,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import PlatformNav from '@/components/platform/PlatformNav'
-import { LinkedInAnalysisResult, LinkedInJobInput, LinkedInSectionFeedback } from '@/types/ai'
+import { LinkedInAnalysisResult, LinkedInSectionFeedback } from '@/types/ai'
 
 function SectionCard({
   sectionKey,
@@ -53,25 +53,23 @@ function SectionCard({
   )
 }
 
-const EMPTY_JOB: LinkedInJobInput = { title: '', company: '', details: '' }
-
 export default function LinkedInToolPage() {
   const [headline, setHeadline] = useState('')
   const [about, setAbout] = useState('')
-  const [jobs, setJobs] = useState<LinkedInJobInput[]>([{ ...EMPTY_JOB }])
+  const [jobs, setJobs] = useState<string[]>([''])
   const [skills, setSkills] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [result, setResult] = useState<LinkedInAnalysisResult | null>(null)
 
-  const hasAnyJobContent = jobs.some((job) => job.title.trim() || job.company.trim() || job.details.trim())
+  const hasAnyJobContent = jobs.some((job) => job.trim())
 
-  function updateJob(index: number, field: keyof LinkedInJobInput, value: string) {
-    setJobs((prev) => prev.map((job, i) => (i === index ? { ...job, [field]: value } : job)))
+  function updateJob(index: number, value: string) {
+    setJobs((prev) => prev.map((job, i) => (i === index ? value : job)))
   }
 
   function addJob() {
-    setJobs((prev) => [...prev, { ...EMPTY_JOB }])
+    setJobs((prev) => [...prev, ''])
   }
 
   function removeJob(index: number) {
@@ -147,16 +145,16 @@ export default function LinkedInToolPage() {
               />
             </div>
             <div>
-              <label className="font-body text-sm text-slate-supporting mb-1 block">Experience</label>
+              <label className="font-body text-sm text-slate-supporting mb-1 block">Your Experience</label>
               <p className="font-body text-slate-supporting text-sm mb-3">
-                Add each job separately so we only use what you tell us about that specific role — never anything
-                borrowed from another job.
+                Go to your LinkedIn profile and copy each job — one at a time — and paste it into its own box below.
+                We&apos;ll optimize each one separately.
               </p>
               <div className="space-y-4">
                 {jobs.map((job, i) => (
-                  <div key={i} className="border-2 border-sage rounded-card p-4 space-y-3">
-                    <div className="flex items-center justify-between">
-                      <p className="font-body text-slate-supporting text-xs tracking-widest uppercase">Job {i + 1}</p>
+                  <div key={i}>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="font-body text-sm text-slate-supporting block">Job {i + 1}</label>
                       {jobs.length > 1 && (
                         <button
                           type="button"
@@ -167,27 +165,11 @@ export default function LinkedInToolPage() {
                         </button>
                       )}
                     </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <input
-                        type="text"
-                        value={job.title}
-                        onChange={(e) => updateJob(i, 'title', e.target.value)}
-                        placeholder="Job title"
-                        className="w-full border-2 border-sage rounded-card px-4 py-2 font-body text-navy focus:outline-none focus:border-amber-hope"
-                      />
-                      <input
-                        type="text"
-                        value={job.company}
-                        onChange={(e) => updateJob(i, 'company', e.target.value)}
-                        placeholder="Company"
-                        className="w-full border-2 border-sage rounded-card px-4 py-2 font-body text-navy focus:outline-none focus:border-amber-hope"
-                      />
-                    </div>
                     <textarea
-                      value={job.details}
-                      onChange={(e) => updateJob(i, 'details', e.target.value)}
+                      value={job}
+                      onChange={(e) => updateJob(i, e.target.value)}
                       rows={5}
-                      placeholder="Paste what your LinkedIn profile says about this job only."
+                      placeholder="Paste one job from your LinkedIn profile here."
                       className="w-full border-2 border-sage rounded-card px-4 py-3 font-body text-navy focus:outline-none focus:border-amber-hope"
                     />
                   </div>
@@ -198,7 +180,7 @@ export default function LinkedInToolPage() {
                 onClick={addJob}
                 className="btn-secondary mt-3"
               >
-                + Add another job
+                Add Another Job
               </button>
             </div>
             <div>
@@ -232,7 +214,7 @@ export default function LinkedInToolPage() {
               <SectionCard
                 key={`experience-${i}`}
                 sectionKey={`experience-${i}`}
-                label={`Experience — ${job.title || 'Untitled role'} at ${job.company || 'Unknown company'}`}
+                label={`Experience — Job ${i + 1}`}
                 feedback={job}
               />
             ))}

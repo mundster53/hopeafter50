@@ -40,24 +40,12 @@ export interface LinkedInSectionFeedback {
   rewrite: string
 }
 
-// One job the member entered in the Experience section of the form.
-// Kept as discrete entries (rather than one pasted blob) so the AI can
-// never blend accomplishments across roles.
-export interface LinkedInJobInput {
-  title: string
-  company: string
-  details: string
-}
-
-export interface LinkedInExperienceFeedback extends LinkedInSectionFeedback {
-  title: string
-  company: string
-}
-
 export interface LinkedInAnalysisResult {
   headline?: LinkedInSectionFeedback
   about?: LinkedInSectionFeedback
-  experience?: LinkedInExperienceFeedback[]
+  // One entry per pasted job textarea, in the same order — each rewritten
+  // in its own isolated AI call so accomplishments never blend across jobs.
+  experience?: LinkedInSectionFeedback[]
   skills?: LinkedInSectionFeedback
 }
 

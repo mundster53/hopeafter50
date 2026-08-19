@@ -10,7 +10,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db/client'
 import { runStructuredPrompt } from '@/lib/ai/anthropic'
-import { LinkedInAnalysisResult, LinkedInExperienceFeedback, LinkedInJobInput, LinkedInSectionFeedback } from '@/types/ai'
+import { LinkedInAnalysisResult, LinkedInSectionFeedback } from '@/types/ai'
 
 const LINKEDIN_TASK_PROMPT = `You are a LinkedIn profile coach helping a job seeker over 50 get noticed by recruiters and hiring managers. The member has pasted sections from their LinkedIn profile. Your job is to give them specific, actionable suggestions to improve each section they provided so their profile gives them the best possible chance of landing a new opportunity.
 
@@ -43,19 +43,10 @@ Respond with ONLY valid JSON (no markdown fences, no commentary outside it) matc
 // commitment to never let a member say something in an interview they can't
 // back up. A single multi-job prompt risks the model blending accomplishments
 // across roles no matter how strong the isolation instruction is worded, so
-// every job gets its own call with only that job's own details in context.
-const JOB_TASK_PROMPT = `You are helping a job seeker over 50 strengthen one specific job entry on their LinkedIn profile. You have been given ONLY the details for this one role — no other jobs, no other context.
+// every job gets its own call with only that job's own pasted text in context.
+const JOB_TASK_PROMPT = `You are helping someone strengthen a single job entry for their LinkedIn profile. They have pasted the text of one job directly from LinkedIn. Rewrite it to be stronger and more compelling using only what they provided. Do not add accomplishments, metrics, tools, or claims that were not stated. Do not invent anything. The member must be able to defend every word in an interview.
 
-Do two things:
-1. Tell them honestly what is working and what is not about this entry — in plain language, like a trusted friend who knows LinkedIn well (2-4 sentences)
-2. Write a stronger version of this experience entry they can copy and paste directly into their LinkedIn profile
-
-Rules:
-- Use ONLY what is provided for this role. Do not add accomplishments, metrics, tools, skills, or claims that were not stated.
-- Do not infer or invent anything, even if it seems plausible for the role or industry.
-- If the details are sparse, write a tight, honest version of what exists rather than padding it out.
-- Lead with scope (team size, budget, geography) if provided, then accomplishments with numbers wherever the member gave numbers.
-- The member must be able to defend every word of the rewrite in an interview.
+Also tell them honestly what is working and what is not about this entry — in plain language, like a trusted friend who knows LinkedIn well (2-4 sentences).
 
 Do not use the words optimize, leverage, assessment, or synergy. Write like a trusted friend, not a career coach. Do not reference resumes, ATS systems, or resume formatting — this is a LinkedIn profile, not a resume.
 
@@ -68,29 +59,18 @@ Respond with ONLY valid JSON (no markdown fences, no commentary outside it) matc
   "rewrite": "..."
 }`
 
-function buildJobInput(job: LinkedInJobInput): string {
-  return [
-    `Title: ${job.title.trim() || 'Not provided'}`,
-    `Company: ${job.company.trim() || 'Not provided'}`,
-    `Details:\n${job.details.trim() || 'Not provided'}`,
-  ].join('\n')
-}
-
-async function analyzeJob(job: LinkedInJobInput): Promise<LinkedInExperienceFeedback> {
+async function analyzeJob(jobText: string): Promise<LinkedInSectionFeedback> {
   try {
-    const feedback = await runStructuredPrompt<LinkedInSectionFeedback>({
+    return await runStructuredPrompt<LinkedInSectionFeedback>({
       taskPrompt: JOB_TASK_PROMPT,
-      input: buildJobInput(job),
+      input: jobText,
       maxTokens: 1024,
     })
-    return { title: job.title.trim(), company: job.company.trim(), ...feedback }
   } catch (err) {
-    console.error('LinkedIn job analysis failed:', job.title, err)
+    console.error('LinkedIn job analysis failed:', err)
     return {
-      title: job.title.trim(),
-      company: job.company.trim(),
       assessment: "We couldn't analyze this job right now. Everything else below was still generated — try this one again in a moment.",
-      rewrite: job.details.trim(),
+      rewrite: jobText,
     }
   }
 }
@@ -109,11 +89,11 @@ export async function POST(req: NextRequest) {
       about = '',
       experience = [],
       skills = '',
-    }: { headline?: string; about?: string; experience?: LinkedInJobInput[]; skills?: string } = body
+    }: { headline?: string; about?: string; experience?: string[]; skills?: string } = body
 
-    const jobs = (Array.isArray(experience) ? experience : []).filter(
-      (job) => job?.title?.trim() || job?.company?.trim() || job?.details?.trim()
-    )
+    const jobs = (Array.isArray(experience) ? experience : [])
+      .map((job) => (typeof job === 'string' ? job.trim() : ''))
+      .filter(Boolean)
 
     if (!headline.trim() && !about.trim() && jobs.length === 0 && !skills.trim()) {
       return NextResponse.json(
