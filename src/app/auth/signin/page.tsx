@@ -5,7 +5,8 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 const REASSURANCES = [
@@ -15,6 +16,21 @@ const REASSURANCES = [
 ]
 
 export default function SignInPage() {
+  return (
+    <Suspense>
+      <SignInForm />
+    </Suspense>
+  )
+}
+
+function SignInForm() {
+  const searchParams = useSearchParams()
+  // Existing members (e.g. clicking a dashboard link whose session expired,
+  // or "Already have an account?") skip the onboarding fields entirely —
+  // they just need their email to get a sign-in link, same as before.
+  const isExistingMember = searchParams.get('mode') === 'existing'
+  const callbackUrl = searchParams.get('callbackUrl') || '/platform/dashboard'
+
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [layoffDate, setLayoffDate] = useState('')
@@ -26,33 +42,35 @@ export default function SignInPage() {
   async function handleEmailSignIn(e: React.FormEvent) {
     e.preventDefault()
 
-    if (!firstName.trim() || !lastName.trim()) {
+    if (!isExistingMember && (!firstName.trim() || !lastName.trim())) {
       setError('Please tell us your first and last name.')
       return
     }
     setError('')
     setLoading(true)
 
-    try {
-      await fetch('/api/auth/register-name', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email,
-          firstName: firstName.trim(),
-          lastName: lastName.trim(),
-          layoffDate: layoffDate.trim(),
-        }),
-      })
-    } catch {
-      // If this fails, sign-in still proceeds — the name is a nice-to-have, not a blocker
+    if (!isExistingMember) {
+      try {
+        await fetch('/api/auth/register-name', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email,
+            firstName: firstName.trim(),
+            lastName: lastName.trim(),
+            layoffDate: layoffDate.trim(),
+          }),
+        })
+      } catch {
+        // If this fails, sign-in still proceeds — the name is a nice-to-have, not a blocker
+      }
+
+      localStorage.setItem('ha50_firstName', firstName.trim())
+      localStorage.setItem('ha50_lastName', lastName.trim())
+      localStorage.setItem('ha50_layoffDate', layoffDate.trim())
     }
 
-    localStorage.setItem('ha50_firstName', firstName.trim())
-    localStorage.setItem('ha50_lastName', lastName.trim())
-    localStorage.setItem('ha50_layoffDate', layoffDate.trim())
-
-    await signIn('email', { email, callbackUrl: '/platform/dashboard', redirect: false })
+    await signIn('email', { email, callbackUrl, redirect: false })
     setSent(true)
     setLoading(false)
   }
@@ -82,60 +100,77 @@ export default function SignInPage() {
           </div>
         ) : (
           <>
-            <h1 className="font-display text-display-md text-white mt-10 mb-4">
-              You tell us what you&rsquo;re going through.
-            </h1>
-            <p className="font-body text-amber-hope text-lg">
-              We create a plan. We help you implement it. And we support you until things get better.
-            </p>
+            {isExistingMember ? (
+              <>
+                <h1 className="font-display text-display-md text-white mt-10 mb-4">
+                  Welcome back.
+                </h1>
+                <p className="font-body text-white/80 mb-10">
+                  Enter your email and we&rsquo;ll send you a secure link straight to your dashboard.
+                </p>
+              </>
+            ) : (
+              <>
+                <h1 className="font-display text-display-md text-white mt-10 mb-4">
+                  You tell us what you&rsquo;re going through.
+                </h1>
+                <p className="font-body text-amber-hope text-lg">
+                  We create a plan. We help you implement it. And we support you until things get better.
+                </p>
 
-            <p className="font-body text-white/80 mt-6 mb-10">
-              That&rsquo;s it. No complicated process. No judgment. Just honest help from people who
-              understand what you&rsquo;re carrying right now. Enter your email and we&rsquo;ll send
-              you a secure link to get started.
-            </p>
+                <p className="font-body text-white/80 mt-6 mb-10">
+                  That&rsquo;s it. No complicated process. No judgment. Just honest help from people who
+                  understand what you&rsquo;re carrying right now. Enter your email and we&rsquo;ll send
+                  you a secure link to get started.
+                </p>
+              </>
+            )}
 
             <form onSubmit={handleEmailSignIn} className="space-y-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="font-body text-sm text-white/70 mb-1 block">
-                    First name
-                  </label>
-                  <input
-                    type="text"
-                    value={firstName}
-                    onChange={e => setFirstName(e.target.value)}
-                    placeholder="First name"
-                    required
-                    className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
-                  />
-                </div>
-                <div>
-                  <label className="font-body text-sm text-white/70 mb-1 block">
-                    Last name
-                  </label>
-                  <input
-                    type="text"
-                    value={lastName}
-                    onChange={e => setLastName(e.target.value)}
-                    placeholder="Last name"
-                    required
-                    className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="font-body text-sm text-white/70 mb-1 block">
-                  When did you last lose a job?
-                </label>
-                <input
-                  type="month"
-                  value={layoffDate}
-                  onChange={e => setLayoffDate(e.target.value)}
-                  max={new Date().toISOString().slice(0, 7)}
-                  className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
-                />
-              </div>
+              {!isExistingMember && (
+                <>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="font-body text-sm text-white/70 mb-1 block">
+                        First name
+                      </label>
+                      <input
+                        type="text"
+                        value={firstName}
+                        onChange={e => setFirstName(e.target.value)}
+                        placeholder="First name"
+                        required
+                        className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
+                      />
+                    </div>
+                    <div>
+                      <label className="font-body text-sm text-white/70 mb-1 block">
+                        Last name
+                      </label>
+                      <input
+                        type="text"
+                        value={lastName}
+                        onChange={e => setLastName(e.target.value)}
+                        placeholder="Last name"
+                        required
+                        className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="font-body text-sm text-white/70 mb-1 block">
+                      When did you last lose a job?
+                    </label>
+                    <input
+                      type="month"
+                      value={layoffDate}
+                      onChange={e => setLayoffDate(e.target.value)}
+                      max={new Date().toISOString().slice(0, 7)}
+                      className="w-full bg-navy border-2 border-white/20 rounded-card px-4 py-3 font-body text-white placeholder-white/40 focus:outline-none focus:border-amber-hope"
+                    />
+                  </div>
+                </>
+              )}
               <div>
                 <label className="font-body text-sm text-white/70 mb-1 block">
                   Your email address
@@ -154,7 +189,7 @@ export default function SignInPage() {
               )}
               <button
                 type="submit"
-                disabled={loading || !email || !firstName.trim() || !lastName.trim()}
+                disabled={loading || !email || (!isExistingMember && (!firstName.trim() || !lastName.trim()))}
                 className="btn-primary w-full disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loading ? 'Sending...' : 'Send My Secure Link'}
@@ -170,9 +205,15 @@ export default function SignInPage() {
             </div>
 
             <p className="font-body text-center mt-10">
-              <Link href="/auth/signin?mode=existing" className="text-white/40 text-sm hover:underline">
-                Already have an account? Sign in here
-              </Link>
+              {isExistingMember ? (
+                <Link href="/auth/signin" className="text-white/40 text-sm hover:underline">
+                  New here? Start your plan
+                </Link>
+              ) : (
+                <Link href="/auth/signin?mode=existing" className="text-white/40 text-sm hover:underline">
+                  Already have an account? Sign in here
+                </Link>
+              )}
             </p>
           </>
         )}

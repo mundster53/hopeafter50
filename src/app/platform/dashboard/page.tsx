@@ -19,12 +19,12 @@ import { ADMIN_EMAIL } from '@/lib/admin/auth'
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
   if (!session?.user?.id) {
-    redirect('/auth/signin')
+    redirect('/auth/signin?mode=existing&callbackUrl=/platform/dashboard')
   }
 
   const member = await getMemberForSession(session.user.id)
   if (!member) {
-    redirect('/auth/signin')
+    redirect('/auth/signin?mode=existing&callbackUrl=/platform/dashboard')
   }
 
   const data = buildDashboardViewModel(member)

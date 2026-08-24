@@ -94,7 +94,7 @@ export async function getDailyEncouragement(
       input: {
         member: { firstName: member.firstName },
         current_stage: member.rebuildPlan?.currentStage ?? 'stabilize',
-        rebuilding_since: describeDuration(member.createdAt, now),
+        rebuilding_since: describeDuration(jobLossSinceFor(member), now),
         days_since_job_loss: days,
         emotional_stage: emotionalStageFor(days),
         primary_fear: member.assessment?.primaryFear ?? null,
