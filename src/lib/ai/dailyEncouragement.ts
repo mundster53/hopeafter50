@@ -34,9 +34,12 @@ export function greetingFor(hour: number): string {
 function describeDuration(since: Date, now: Date): string {
   const days = Math.max(0, Math.floor((now.getTime() - since.getTime()) / 86_400_000))
   if (days < 14) return `${days} day${days === 1 ? '' : 's'}`
-  const weeks = Math.floor(days / 7)
+  // Round to the nearest week/month rather than flooring — flooring made day 20
+  // (nearly 3 weeks) describe itself as "2 weeks", which the AI would then
+  // read back to the member as a stale, wrong-sounding "two weeks in".
+  const weeks = Math.round(days / 7)
   if (weeks < 10) return `${weeks} weeks`
-  const months = Math.floor(days / 30)
+  const months = Math.round(days / 30)
   return `${months} month${months === 1 ? '' : 's'}`
 }
 
