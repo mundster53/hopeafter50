@@ -64,6 +64,21 @@ function emotionalStageFor(days: number): string {
   return 'exhaustion_identity'
 }
 
+function firstSentence(message: string): string {
+  const match = message.match(/^.*?[.!?](?:\s|$)/)
+  return (match ? match[0] : message).trim()
+}
+
+async function recentOpenersFor(memberId: string, date: string): Promise<string[]> {
+  const rows = await prisma.dailyEncouragement.findMany({
+    where: { memberId, date: { lt: date } },
+    orderBy: { date: 'desc' },
+    take: 7,
+    select: { message: true },
+  })
+  return rows.map((row) => firstSentence(row.message))
+}
+
 /**
  * Returns today's Daily Word for a member, generating and caching it on
  * first request of the day. Safe to call repeatedly — later calls the
@@ -90,6 +105,7 @@ export async function getDailyEncouragement(
   if (!member) return null
 
   const days = daysSinceJobLoss(jobLossSinceFor(member), now)
+  const recent_openers = await recentOpenersFor(memberId, date)
 
   const message = (
     await runTextPrompt({
@@ -102,6 +118,7 @@ export async function getDailyEncouragement(
         emotional_stage: emotionalStageFor(days),
         primary_fear: member.assessment?.primaryFear ?? null,
         success_vision: member.assessment?.successVision ?? null,
+        recent_openers,
       },
       maxTokens: 300,
     })

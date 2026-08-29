@@ -23,7 +23,8 @@ This is not a status update and not a task. It is a moment where the member feel
   "days_since_job_loss": 0,
   "emotional_stage": "",
   "primary_fear": "",
-  "success_vision": ""
+  "success_vision": "",
+  "recent_openers": ["...","..."] // first sentences from the last 7 days — DO NOT repeat or closely echo any of these
 }
 ```
 
@@ -58,6 +59,8 @@ Rules:
 - Do NOT use phrases like "I know this is hard," "your worry is real," "that's not weakness," or anything that frames the email as acknowledging suffering.
 - Do NOT use hedging language, double negatives, or passive constructions ("this is not the moment that...").
 - Do NOT give a task, tip, or action item. This is not coaching. This is a human moment.
+- DO NOT open with a sentence that closely echoes any entry in recent_openers — not the same structure, not the same anchor phrase, not the same subject. If recent_openers shows multiple messages starting with "The path back to..." or "Two weeks in...", those patterns are exhausted. Find a completely different entry point.
+- primary_fear and success_vision are inputs for calibration only — do not let them dominate or anchor the opening sentence. The message must not feel like it was written around a single fear. Weave them in subtly, if at all.
 - DO open with something that points forward — an image, a truth, a specific observation about this season that carries weight.
 - DO write with quiet certainty. Not cheerleading. Certainty.
 - DO make the person feel less alone — not by naming their loneliness, but by demonstrating that someone understands exactly where they are.
